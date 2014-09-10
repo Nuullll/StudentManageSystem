@@ -8,5 +8,4 @@
 
 void UpdatePassword(std::string id_num, std::string new_password);
 
-
 #endif
