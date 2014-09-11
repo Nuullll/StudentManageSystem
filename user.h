@@ -10,8 +10,8 @@
 #include <fstream>
 #include "score.h"
 
-enum UserType { ENUM_ADMINISTRATOR, ENUM_TEACHER, ENUM_STUDENT };
-// 用户类型分为管理员,老师,学生三种身份.
+enum UserType { ADMINISTRATOR, TEACHER, STUDENT, TEACHINGASSISTANT };
+// 用户类型分为管理员,老师,学生,助教四种身份.
 
 class User
 {
@@ -40,7 +40,7 @@ class Administrator: public User        // 继承自user抽象类
 {
 public:
     Administrator(){}
-    Administrator(std::string id, std::string password): User(ENUM_ADMINISTRATOR, id, password)
+    Administrator(std::string id, std::string password): User(ADMINISTRATOR, id, password)
     {}
     ~Administrator();
 
@@ -61,7 +61,7 @@ class Teacher: virtual public User
 public:
     Teacher(){}
     Teacher(std::string id, std::string password, std::string name, std::vector<std::string> course_id, bool is_head_teacher = 0, std::string class_id = 0): 
-            User(ENUM_TEACHER, id, password), name_(name), course_id_(course_id), is_head_teacher_(is_head_teacher), class_id_(class_id)
+            User(TEACHER, id, password), name_(name), course_id_(course_id), is_head_teacher_(is_head_teacher), class_id_(class_id)
     {}
     ~Teacher();
 
@@ -90,11 +90,11 @@ public:
     Student(){}
     Student(std::string id, std::string password, std::string name, std::string class_id, 
             std::vector<std::string> course_id):
-            User(ENUM_STUDENT, id, password), name_(name), class_id_(class_id), course_id_(course_id) 
+            User(STUDENT, id, password), name_(name), class_id_(class_id), course_id_(course_id) 
     {}
     ~Student();
 
-    void print() { std::cout << name_ << "同学" << '(' << id_ << ')' << std::endl; }
+    void print() { std::cout << name_ << "同学 " << '(' << id_ << ')' << std::endl; }
     std::string get_name() { return name_; }
     std::string get_class_id() { return class_id_; }
     std::vector<std::string> get_course_id() { return course_id_; }
@@ -117,7 +117,7 @@ public:
     TeachingAssistant(){}
     TeachingAssistant(std::string id, std::string password, std::string name, std::vector<std::string> teach_course_id, 
                     std::vector<std::string> learn_course_id, std::string class_id):
-                    User(ENUM_TEACHER, id, password), Teacher(id, password, name, teach_course_id), Student(id, password, name, class_id, learn_course_id)
+                    User(TEACHINGASSISTANT, id, password), Teacher(id, password, name, teach_course_id), Student(id, password, name, class_id, learn_course_id)
     {}
     ~TeachingAssistant();
 

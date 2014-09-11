@@ -5,10 +5,17 @@
 #include <conio.h>
 #include "file.h"
 #include "token.h"
+#include <stdlib.h>
 
-void Welcome()
+void Title()
 {
 	std::cout << "学生成绩管理系统 v1.60.0\n\n";
+}
+
+void ClearScreen()
+{
+    system("cls");
+    Title();
 }
 
 Token Login()
@@ -31,7 +38,27 @@ Token Login()
 
 int main(int argc, char const *argv[])
 {
-	welcome();
-    
+	Title();
+    std::vector<User*> users;
+    users = ReadUsers("./data");
+    Token tmp;
+    User* user;
+    while (True)
+    {
+        tmp(Login());
+        if ((user = tmp.auth(users)) != NULL)
+        {
+            std::cout << "登录成功!\n";
+            std::cout << "欢迎";
+            user->print();
+            break;
+        }
+        else
+        {
+            ClearScreen();
+            std::cout << "学号(工号)或密码错误! 请重新输入!\n";
+        }
+    }
+
 	return 0;
 }

@@ -54,3 +54,4 @@ std::ofstream &operator <<(std::ofstream &of, const Student &stu)
     of << '\n';
     return of;
 }
+
