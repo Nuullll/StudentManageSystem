@@ -16,21 +16,21 @@ enum UserType { ENUM_ADMINISTRATOR, ENUM_TEACHER, ENUM_STUDENT };
 class User
 {
 public:
+    friend class Token;
     User(){}
     User(UserType identity, std::string id, std::string password):
-        identity_(identity), id_num_(id), password_(password) {}
+        identity_(identity), id_(id), password_(password) {}
     virtual ~User();
 
     virtual void print() = 0;
     UserType identity() { return identity_; }
-    std::string id_num() { return id_num_; }
-    std::string password() { return password_; }
+    std::string id() { return id_; }
     void set_password(std::string new_password);
 
 
 protected:
     UserType identity_;         // 用户身份
-    std::string id_num_;        // 用户ID
+    std::string id_;            // 用户ID
     std::string password_;      // 登录管理系统所用密码
 };
 
@@ -44,7 +44,7 @@ public:
     {}
     ~Administrator();
 
-    void print() { std::cout << "管理员: " << id_num_ << std::endl; }
+    void print() { std::cout << "管理员: " << id_ << std::endl; }
     std::string add_user(UserType identity, std::string default_password);
     void del_user(std::string id);
   
@@ -69,7 +69,7 @@ public:
     std::string name() { return name_; }
     std::vector<std::string> courses() { return course_id_; }
     bool is_head_teacher() { return is_head_teacher_; }
-    std::string class() { return class_id_; }
+    std::string class_id() { return class_id_; }
 
     friend std::ofstream &operator <<(std::ofstream &of, const Teacher &t);
 
@@ -94,7 +94,7 @@ public:
     {}
     ~Student();
 
-    void print() { std::cout << name_ << "同学" << '(' << id_num_ << ')' << std::endl; }
+    void print() { std::cout << name_ << "同学" << '(' << id_ << ')' << std::endl; }
     std::string get_name() { return name_; }
     std::string get_class_id() { return class_id_; }
     std::vector<std::string> get_course_id() { return course_id_; }
