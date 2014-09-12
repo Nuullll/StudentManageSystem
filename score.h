@@ -6,8 +6,8 @@
 class Score
 {
 public:
-    Score();
-    ~Score();
+    Score(std::string course_id, std::string student_id, int num):
+          course_id_(course_id), student_id_(student_id), num_(num) {};
 
     friend std::ofstream &operator <<(std::ofstream &of, const Score &s);
 

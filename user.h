@@ -10,7 +10,7 @@
 #include <fstream>
 #include "score.h"
 
-enum UserType { ADMINISTRATOR, TEACHER, STUDENT, TEACHINGASSISTANT };
+enum UserType { ADMINISTRATOR, TEACHER, STUDENT, TEACHING_ASSISTANT };
 // 用户类型分为管理员,老师,学生,助教四种身份.
 
 class User
@@ -45,8 +45,7 @@ public:
     ~Administrator();
 
     void print() { std::cout << "管理员: " << id_ << std::endl; }
-    std::string add_user(UserType identity, std::string default_password);
-    void del_user(std::string id);
+
   
     friend std::ofstream &operator <<(std::ofstream &of, const Administrator &admin);
 
@@ -95,10 +94,10 @@ public:
     ~Student();
 
     void print() { std::cout << name_ << "同学 " << '(' << id_ << ')' << std::endl; }
-    std::string get_name() { return name_; }
-    std::string get_class_id() { return class_id_; }
-    std::vector<std::string> get_course_id() { return course_id_; }
-    std::vector<Score> get_score() { return score_; }
+    std::string name() { return name_; }
+    std::string class_id() { return class_id_; }
+    std::vector<std::string> course_id() { return course_id_; }
+    std::vector<Score> score() { return score_; }
 
     friend std::ofstream &operator <<(std::ofstream &of, const Student &stu);
 
@@ -114,12 +113,11 @@ private:
 class TeachingAssistant: public Teacher, public Student
 {
 public:
-    TeachingAssistant(){}
+    TeachingAssistant(){};
     TeachingAssistant(std::string id, std::string password, std::string name, std::vector<std::string> teach_course_id, 
                     std::vector<std::string> learn_course_id, std::string class_id):
-                    User(TEACHINGASSISTANT, id, password), Teacher(id, password, name, teach_course_id), Student(id, password, name, class_id, learn_course_id)
-    {}
-    ~TeachingAssistant();
+                    User(TEACHING_ASSISTANT, id, password), Teacher(id, password, name, teach_course_id), 
+                    Student(id, password, name, class_id, learn_course_id) {};
 
     friend std::ofstream &operator <<(std::ofstream &of, const TeachingAssistant &ta);
 private:
