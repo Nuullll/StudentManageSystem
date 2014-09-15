@@ -27,8 +27,8 @@ public:
     virtual void update() = 0;  // 更新全局vector
     friend bool operator ==(User &u, int id){ return u.id_ == id; }
     friend std::ofstream &operator <<(std::ofstream &of, const User &u);
-    UserType identity() { return identity_; }
     int id() { return id_; }
+    UserType identity() { return identity_; }
     void set_password();
 
 
@@ -73,10 +73,10 @@ public:
     void display_class();
     void print() { std::cout << name_ << "老师" << std::endl; }
     void update();
-
+    friend std::ifstream &operator >>(std::ifstream &in, Teacher &t);
     friend std::ofstream &operator <<(std::ofstream &of, const Teacher &t);
 
-private:
+protected:
     std::string name_;                               // 老师姓名
     std::vector<std::string> course_id_;             // 课程ID
     bool is_head_teacher_;                           // 是否班主任
@@ -89,27 +89,28 @@ const int kStudentMaxCredit = 32;       // 单学期学分上限
 class Student: virtual public User
 {
 public:
-    Student(){}
+    Student() {}
     Student(int id, std::string password, std::string name, std::string class_id, 
             std::vector<std::string> course_id):
-            User(STUDENT, id, password), name_(name), class_id_(class_id), course_id_(course_id) 
-    {}
-    ~Student();
+            User(STUDENT, id, password), name_(name), class_id_(class_id), course_id_(course_id) {}
+    ~Student() {}
 
+    double gpa();
+    int credit();
+    std::string class_id() { return class_id_; }
+    std::string name() { return name_; }
+    std::vector<Score> score() { return score_; }
+    std::vector<std::string> course_id() { return course_id_; }
+    void add_course();
+    void add_score(Score score);
+    void course_info();
+    void display_gpa_info();
     void print() { std::cout << name_ << "同学 " << '(' << id_ << ')' << std::endl; }
     void update();
-    void course_info();
-    void add_course();
-    void display_gpa_info();
-    double gpa();
-    std::string name() { return name_; }
-    std::string class_id() { return class_id_; }
-    std::vector<std::string> course_id() { return course_id_; }
-    std::vector<Score> score() { return score_; }
-
+    friend std::ifstream &operator >>(std::ifstream &in, Student &stud);
     friend std::ofstream &operator <<(std::ofstream &of, const Student &stu);
 
-private:
+protected:
     std::string name_;                              // 学生姓名
     std::string class_id_;                          // 班号
     std::vector<std::string> course_id_;            // 课程ID
@@ -121,17 +122,17 @@ bool CompareStudent(Student stu1, Student stu2);
 class TeachingAssistant: public Teacher, public Student
 {
 public:
-    TeachingAssistant(){};
+    TeachingAssistant() {}
     TeachingAssistant(int id, std::string password, std::string name, std::vector<std::string> teach_course_id, 
-                    std::vector<std::string> learn_course_id, std::string class_id):
-                    User(TEACHING_ASSISTANT, id, password), Teacher(id, password, name, teach_course_id), 
-                    Student(id, password, name, class_id, learn_course_id) {};
+                      std::vector<std::string> learn_course_id, std::string class_id):
+                      User(TEACHING_ASSISTANT, id, password), Teacher(id, password, name, teach_course_id), 
+                      Student(id, password, name, class_id, learn_course_id) {}
+    ~TeachingAssistant() {}
 
     void print() { std::cout << Teacher::name() << "助教 " << std::endl; }
     void update();
+    friend std::ifstream &operator >>(std::ifstream &in, TeachingAssistant &ta);
     friend std::ofstream &operator <<(std::ofstream &of, const TeachingAssistant &ta);
-private:
-
 };
 
 

@@ -10,17 +10,17 @@
 #include "user.h"
 
 // user info
-void WriteAdmins(std::string filename, std::vector<Administrator> admins);
-void WriteTeachers(std::string filename, std::vector<Teacher> teachers);
-void WriteStudents(std::string filename, std::vector<Student> students);
-void WriteTAs(std::string filename, std::vector<TeachingAssistant> tas);
-std::vector<User*> ReadUsers(std::string path);
-std::vector<Administrator> ReadAdmins(std::string filename);
-std::vector<Teacher> ReadTeachers(std::string filename);
-std::vector<Student> ReadStudents(std::string filename);
-std::vector<TeachingAssistant> ReadTAs(std::string filename);
+void WriteAdmins(char* filename, std::vector<Administrator> admins);
+void WriteTeachers(char* filename, std::vector<Teacher> teachers);
+void WriteStudents(char* filename, std::vector<Student> students);
+void WriteTAs(char* filename, std::vector<TeachingAssistant> tas);
+void ReadAdmins(char* filename);
+void ReadTeachers(char* filename);
+void ReadStudents(char* filename);
+void ReadTAs(char* filename);
+void ReadUsers();
 
-void WriteCourses(std::string filename, std::vector<Course> courses);
-std::vector<Course> ReadCourses(std::string filename);
+void WriteCourses(char* filename, std::vector<Course> courses);
+void ReadCourses(char* filename);
 
 #endif

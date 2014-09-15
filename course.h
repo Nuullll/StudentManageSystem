@@ -28,9 +28,10 @@ public:
     void update();
     void display();
     void update_score();
-    double avg_score();
 
     friend bool operator ==(Course &c, std::string id){ return (c.id_ == id) || (c.name_ == id); }
+    friend std::ifstream &operator >>(std::ifstream &in, Course &c);
+    friend std::ofstream &operator <<(std::ofstream &of, const Course &c);
 
 private:
     std::string id_;                            // 课程ID
@@ -38,8 +39,8 @@ private:
     int credit_;                                // 学分
     bool is_optional_;                          // 是否任选(非任选则为必修限选课程)
     bool is_scoring_;                           // 是否记分
-    std::vector<int> teachers_id_;      // 老师团队
-    std::vector<int> students_id_;      // 学生ID
+    std::vector<int> teacher_id_;      // 老师团队
+    std::vector<int> student_id_;      // 学生ID
 };
 
 #endif

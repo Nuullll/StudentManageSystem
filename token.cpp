@@ -3,7 +3,7 @@
 #include "token.h"
 #include <iostream>
 
-User*Token::auth(const std::vector<User*> users)
+User* Token::auth(const std::vector<User*> users)
 {
 	std::vector<User*>::const_iterator it;
 	for (it = users.begin(); it != users.end(); it++)

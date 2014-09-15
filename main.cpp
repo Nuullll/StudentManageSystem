@@ -456,18 +456,6 @@ ta_right:
     return 0;
 }
 
-
-void Title()
-{
-	std::cout << "学生成绩管理系统 v1.60.0\n\n";
-}
-
-void ClearScreen()
-{
-    system("cls");
-    Title();
-}
-
 std::string GetPass()
 {
     std::string pwd;
@@ -490,6 +478,48 @@ Token Login()
     std::cout << "请输入您的密码: ";
     pwd = GetPass();
     return Token(id, pwd);
+}
+
+void ClearScreen()
+{
+    system("cls");
+    Title();
+}
+
+void Exit()
+{
+    ClearScreen();  // 清屏
+    std::cout << "确认退出? [y/n]" << std::endl;
+    ch = getch();
+    if (ch == 'y' or ch == 'Y')
+    {
+        std::cout << "再见!" << std::endl;
+        return 0;
+    }
+}
+
+void Title()
+{
+	std::cout << "学生成绩管理系统 v1.60.0\n\n";
+}
+
+void UpdateFiles()
+{
+    // 根据全局vector更新文件.
+    WriteAdmins("./data/admins.txt", admins);
+    WriteTeachers("./data/teachers.txt", teachers);
+    WriteStudents("./data/students.txt", students);
+    WriteTAs("./data/tas.txt", tas);    
+}
+
+void UpdateUsers()
+{
+    // 从文件读取用户信息.
+    ReadUsers("./data");
+    ReadAdmins("./data/admins.txt");
+    ReadTeachers("./data/teachers.txt");
+    ReadStudents("./data/students.txt");
+    ReadTAs("./data/tas.txt");
 }
 
 template <class A, class B>
@@ -515,35 +545,4 @@ std::vector<T> Remove(std::vector<T> v, int id)
         }
     }
     return v;
-}
-
-void UpdateUsers()
-{
-    // 从文件读取用户信息.
-    users = ReadUsers("./data");
-    admins = ReadAdmins("./data/admins.txt");
-    teachers = ReadTeachers("./data/teachers.txt");
-    students = ReadStudents("./data/students.txt");
-    tas = ReadTAs("./data/tas.txt");
-}
-
-void UpdateFiles()
-{
-    // 根据全局vector更新文件.
-    WriteAdmins("./data/admins.txt", admins);
-    WriteTeachers("./data/teachers.txt", teachers);
-    WriteStudents("./data/students.txt", students);
-    WriteTAs("./data/tas.txt", tas);    
-}
-
-void Exit()
-{
-    ClearScreen();  // 清屏
-    std::cout << "确认退出? [y/n]" << std::endl;
-    ch = getch();
-    if (ch == 'y' or ch == 'Y')
-    {
-        std::cout << "再见!" << std::endl;
-        return 0;
-    }
 }

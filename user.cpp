@@ -293,7 +293,7 @@ void Teacher::display_class()
         if (it->Student::class_id() == class_id_)
             my_class.push_back(*it);
     }
-    sort(my_class.begin(), my_class.end(), CompareStudent);
+    std::sort(my_class.begin(), my_class.end(), CompareStudent);
     ClearScreen();
     HighlightPrint(class_id_ + '\n');
     std::cout << "[按GPA排序]\n";
@@ -311,28 +311,37 @@ void Teacher::update()
     return;
 }
 
-void Student::update()
+std::ifstream &operator >>(std::ifstream &in, Teacher &t)
 {
-    students = Remove(students, id_);
-    students.push_back(*this);
-    UpdateFiles();
-    return;
+    in >> t.identity_;
+    in >> t.id_;
+    in >> t.password_;
+    in >> t.name_;
+    char start_flag;
+    while ((start_flag = in.get()) == '\n')
+        ;
+    if (start_flag == '*')
+    {
+        while (true)
+        {
+            char end_flag;
+            std::string tmp_id;
+            in >> tmp_id;
+            t.course_id_.push_back(tmp_id);
+            while ((end_flag = in.get()) == '\n')
+                ;
+            if (end_flag == '#')
+                break;
+            else
+                in.seekg(-1, std::ios::cur);           
+        }
+    }
+    else
+        in.seekg(-1, std::ios::cur);
+    in >> t.is_head_teacher_;
+    in >> t.class_id_;
+    return in;
 }
-
-bool CompareStudent(Student stu1, Student stu2)
-{
-    return stu1.gpa() > stu2.gpa();
-}
-
-void TeachingAssistant::update()
-{
-    tas = Remove(tas, id_);
-    tas.push_back(*this);
-    UpdateFiles();
-    return;
-}
-
-
 
 std::ofstream &operator <<(std::ofstream &of, const Teacher &t)
 {
@@ -348,6 +357,146 @@ std::ofstream &operator <<(std::ofstream &of, const Teacher &t)
     of << t.is_head_teacher_ << '\n';
     of << t.class_id_ << '\n\n';
     return of;
+}
+
+double Student::gpa()
+{
+    int total = 0;
+    for (std::vector<Score>::iterator it = score_.begin(); it != score_.end(); it++)
+        total += it->num() * courses[Find(courses, it->course_id())].credit();
+    return double(total) / double(credit());
+}
+
+int Student::credit()
+{
+    int total = 0;
+    for (std::vector<std::string>::iterator it = course_id_.begin(); it != course_id_.end(); it++)
+        total += courses[Find(courses, *it)].credit();
+    return total;
+}
+
+void Student::add_course()
+{
+    ClearScreen();
+    HighlightPrint("课程ID: ");
+    std::string add_id;
+    std::cin >> add_id;
+    if (Find(courses, add_id) < 0)
+    {
+        HighlightPrint("没有该课程! 请核对课程ID.\n");
+        getch();
+        return;
+    }
+    course_id_.push_back(add_id);
+    update();
+    courses[Find(courses, add_id)].add_student(id_);
+    WriteCourses("./data/courses.txt", courses);
+    HighlightPrint("添加成功!\n");
+    getch();
+    return;
+}
+
+void Student::add_score(Score score)
+{
+    if (Find(score_, score) < 0)
+        score_.push_back(score);
+    else
+        score_[Find(score_, score)].update_num(score.num());
+    return;
+}
+
+void Student::course_info()
+{
+    ClearScreen();
+    for (std::vector<std::string>::iterator it = course_id_.begin(); it != course_id_.end(); it++)
+    {
+        Course tmp = courses[Find(courses, *it)];
+        std::cout << tmp.id() << "  ";
+        std::cout << tmp.name() << "  ";
+        std::cout << tmp.credit() << "学分  ";
+        if (tmp.is_optional())
+            std::cout << "选修课程 ";
+        else
+            std::cout << "必限课程 ";
+        if (tmp.is_scoring())
+        {
+            Score score = score_[Find(score_, tmp.id())];
+            std::cout << score.num() << ' ';
+            std::cout << "课程内排名: " << score.rank() << '/' << tmp.students().size() << std::endl;
+        }
+        else
+            std::cout << "不记分  \n";
+    }
+    std::cout << "总GPA: " << gpa() << std::endl;
+    return;
+}
+
+void Student::display_gpa_info()
+{
+    std::cout << id_ << ' ';
+    std::cout << name_ << ' ';
+    std::cout << class_id_ << ' ';
+    std::cout << "GPA: " << gpa() << std::endl;
+    return;
+}
+
+void Student::update()
+{
+    students = Remove(students, id_);
+    students.push_back(*this);
+    UpdateFiles();
+    return;
+}
+
+std::ifstream &operator >>(std::ifstream &in, Student &stu)
+{
+    in >> stu.identity_;
+    in >> stu.id_;
+    in >> stu.password_;
+    in >> stu.name_;
+    in >> stu.class_id_;
+    char start_flag;
+    while ((start_flag = getch()) == '\n')
+        ;
+    if (start_flag == '*')
+    {
+        while (true)
+        {
+            char end_flag;
+            std::string tmp_id;
+            in >> tmp_id;
+            stu.course_id_.push_back(tmp_id);
+            while ((end_flag = in.get()) == '\n')
+                ;
+            if (end_flag == '#')
+                break;
+            else
+                in.seekg(-1, std::ios::cur);
+        }
+    }
+    else
+        in.seekg(-1, std::ios::cur);
+    while ((start_flag = getch()) == '\n')
+        ;
+    if (start_flag == '*')
+    {
+        while (true)
+        {
+            char end_flag;
+            Score tmp_score;
+            in >> tmp_score;
+            stu.score_.push_back(tmp_score);
+            while ((end_flag = in.get()) == '\n')
+                ;
+            if (end_flag == '#')
+                break;
+            else
+                in.seekg(-1, std::ios::cur);
+        }
+    }
+    else
+        in.seekg(-1, std::ios::cur);
+    return in;
 }
 
 std::ofstream &operator <<(std::ofstream &of, const Student &stu)
@@ -373,6 +522,70 @@ std::ofstream &operator <<(std::ofstream &of, const Student &stu)
     return of;
 }
 
+bool CompareStudent(Student stu1, Student stu2)
+{
+    return stu1.gpa() > stu2.gpa();
+}
+
+void TeachingAssistant::update()
+{
+    tas = Remove(tas, id_);
+    tas.push_back(*this);
+    UpdateFiles();
+    return;
+}
+
+std::ifstream &operator >>(std::ifstream &in, TeachingAssistant &ta)
+{
+    in >> ta.identity_;
+    in >> ta.id_;
+    in >> ta.password_;
+    in >> ta.name_;
+    in >> ta.class_id_;
+    char start_flag;
+    while ((start_flag = getch()) == '\n')
+        ;
+    if (start_flag == '*')
+    {
+        while (true)
+        {
+            char end_flag;
+            std::string tmp_id;
+            in >> tmp_id;
+            ta.Teacher::course_id_.push_back(tmp_id);
+            while ((end_flag = in.get()) == '\n')
+                ;
+            if (end_flag == '#')
+                break;
+            else
+                in.seekg(-1, std::ios::cur);
+        }
+    }
+    else
+        in.seekg(-1, std::ios::cur);
+    while ((start_flag = getch()) == '\n')
+        ;
+    if (start_flag == '*')
+    {
+        while (true)
+        {
+            char end_flag;
+            std::string tmp_id;
+            in >> tmp_id;
+            ta.Student::course_id_.push_back(tmp_id);
+            while ((end_flag = in.get()) == '\n')
+                ;
+            if (end_flag == '#')
+                break;
+            else
+                in.seekg(-1, std::ios::cur);
+        }
+    }
+    else
+        in.seekg(-1, std::ios::cur);
+    return in;
+}
+
 std::ofstream &operator <<(std::ofstream &of, const TeachingAssistant &ta)
 {
     of << User(ta);
@@ -395,5 +608,3 @@ std::ofstream &operator <<(std::ofstream &of, const TeachingAssistant &ta)
     of << "\n";
     return of;
 }
-
-

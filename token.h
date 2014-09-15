@@ -10,9 +10,9 @@
 class Token
 {
 public:
-	Token(){};
-	Token(std::string id, std::string password): id_(id), password_(password) {};
-    ~Token(){};
+	Token() {}
+	Token(std::string id, std::string password): id_(id), password_(password) {}
+    ~Token() {}
     std::string id() { return id_; }
 	User* auth(const std::vector<User*> users);
 

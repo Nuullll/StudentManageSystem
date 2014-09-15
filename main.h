@@ -13,18 +13,16 @@ extern std::vector<Student> students;
 extern std::vector<TeachingAssistant> tas; // ta: teachingassistant
 extern std::vector<Course> courses;
 
-void UpdateUsers();
-void UpdateFiles();
-void Title();
-void ClearScreen();
-void Exit();
 std::string GetPass();
 Token Login();
+void ClearScreen();
+void Exit();
+void Title();
+void UpdateFiles();
+void UpdateUsers();
 
-template <class T>
-T Find(std::vector<T> vt, std::string id);
+template <class A, class B>
+int Find(std::vector<A> v, B id);
 
 template <class T>
 std::vector<T> Remove(std::vector<T> v, int id);
-
-std::vector<MenuNode> InitialMenu(int identity);
