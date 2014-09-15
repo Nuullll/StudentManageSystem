@@ -6,12 +6,10 @@
 
 #include <string>
 #include <vector>
+#include "course.h"
 #include "user.h"
 
-void UpdatePassword(std::string id_num, std::string new_password);
-
 // user info
-void WriteUsers(std::string path, std::vector<User*> users);
 void WriteAdmins(std::string filename, std::vector<Administrator> admins);
 void WriteTeachers(std::string filename, std::vector<Teacher> teachers);
 void WriteStudents(std::string filename, std::vector<Student> students);
@@ -21,5 +19,8 @@ std::vector<Administrator> ReadAdmins(std::string filename);
 std::vector<Teacher> ReadTeachers(std::string filename);
 std::vector<Student> ReadStudents(std::string filename);
 std::vector<TeachingAssistant> ReadTAs(std::string filename);
+
+void WriteCourses(std::string filename, std::vector<Course> courses);
+std::vector<Course> ReadCourses(std::string filename);
 
 #endif

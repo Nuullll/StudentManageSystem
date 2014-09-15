@@ -147,10 +147,7 @@ admin_right:
             Teacher teacher;
             teacher = teachers[Find(teachers, tmp.id())];
             MenuNode top_menu, course_menu, user_menu;
-            std::vector<MenuNode> courses_menu(teacher.course_id().size());
             top_menu.previous = course_menu.previous = class_menu.previous = user_menu.previous = &top_menu;
-            for (std::vector<MenuNode>::iterator it = courses_menu.begin(); it != courses_menu.end(); it++)
-                it->previous = &course_menu;
             top_menu.append("课程管理", &course_menu);
             if (teacher.is_head_teacher())
                 top_menu.append("查看班级", NULL);
@@ -224,7 +221,231 @@ teacher_right:
                                 case "退出登录":
                                     goto login;
                                 default:
+                                {
+                                    Course course = courses[Find(courses, now.options_target[k])];
+                                    if (course.is_scoring())
+                                    {
+                                        std::cout << "现在录入成绩? [y/n]";
+                                        ch = getch();
+                                        if (ch == 'y' || ch == 'Y')
+                                        {
+                                            course.update_score();
+                                            break;
+                                        }
+                                    }
+                                    course.display();
                                     break;
+                                }
+                            }
+                            k = 0;
+                            break;
+                        }
+                        else
+                        {
+                            now = *now.options_target[k];
+                            k = 0;
+                            break;
+                        }
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
+        // 学生菜单.
+        case STUDENT:
+        {
+            Student student;
+            student = students[Find(students, tmp.id())];
+            MenuNode top_menu, user_menu;
+            top_menu.previous = user_menu.previous = &top_menu;
+            top_menu.append("所有课程", NULL);
+            top_menu.append("增加课程", NULL);
+            top_menu.append("个人中心", &user_menu);
+            top_menu.append("退出系统", NULL);
+            user_menu.append("修改密码", NULL);
+            user_menu.append("退出登录", NULL);
+            MenuNode now = top_menu;
+            int k = 0;
+            while (true)
+            {
+                now.show(k);
+                int ch = getch();
+                if (ch == 13)
+                    goto student_right;
+                if (ch == 27)
+                    goto student_left;
+                while (ch != 224)
+                    ;
+                switch (getch())
+                {
+                    case UP:
+                    {
+                        if (--k < 0)
+                            k = now.options_target.size() - 1;
+                        break;
+                    }
+                    case DOWN:
+                    {
+                        if (++k > now.options_target.size() - 1)
+                            k = 0;
+                        break;
+                    }
+                    case LEFT:
+                    {
+student_left:
+                        now = *now.previous;
+                        k = 0;
+                        break;
+                    }
+                    case RIGHT:
+                    {
+                        student_right:
+                        if (now.options_target[k] == NULL)
+                        {
+                            switch (now.options_text[k])
+                            {
+                                case "所有课程":
+                                {
+                                    student.course_info();
+                                    break;
+                                }
+                                case "增加课程":
+                                {
+                                    student.add_course();
+                                    break;
+                                }
+                                case "退出系统":
+                                {
+                                    Exit();
+                                    break;
+                                }
+                                case "修改密码":
+                                {
+                                    student.set_password();
+                                    break;
+                                }
+                                case "退出登录":
+                                    goto login;
+                                default:
+                                    break;
+                            }
+                            k = 0;
+                            break;
+                        }
+                        else
+                        {
+                            now = *now.options_target[k];
+                            k = 0;
+                            break;
+                        }
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
+        // 助教菜单
+        case TEACHING_ASSISTANT:
+        {
+            TeachingAssistant ta;
+            ta = tas[Find(tas, tmp.id())];
+            MenuNode top_menu, teacher_menu, student_menu, user_menu;
+            top_menu.previous = teacher_menu.previous = student_menu.previous = user_menu.previous = &top_menu;
+            top_menu.append("教师界面", &teacher_menu);
+            top_menu.append("学生界面", &student_menu);
+            top_menu.append("个人中心", &user_menu);
+            top_menu.append("退出系统", NULL);
+            for (int i = 0; i < ta.Teacher::course_id().size(); i++)
+                teacher_menu.append(courses[Find(courses, ta.Teacher::course_id()[i])].name(), NULL);
+            teacher_menu.append("增开课程", NULL);
+            student_menu.append("所有课程", NULL);
+            student_menu.append("增加课程", NULL);
+            user_menu.append("修改密码", NULL);
+            user_menu.append("退出登录", NULL);
+            MenuNode now = top_menu;
+            int k = 0;
+            while (true)
+            {
+                now.show(k);
+                int ch = getch();
+                if (ch == 13)
+                    goto ta_right;
+                if (ch == 27)
+                    goto ta_left;
+                while (ch != 224)
+                    ;
+                switch (getch())
+                {
+                    case UP:
+                    {
+                        if (--k < 0)
+                            k = now.options_target.size() - 1;
+                        break;
+                    }
+                    case DOWN:
+                    {
+                        if (++k > now.options_target.size() + 1)
+                            k = 0;
+                        break;
+                    }
+                    case LEFT:
+                    {
+ta_left:
+                        now = *now.previous;
+                        k = 0;
+                        break;
+                    }
+                    case RIGHT:
+                    {
+ta_right:
+                        if (now.options_target[k] == NULL)
+                        {
+                            switch (now.options_text[k])
+                            {
+                                case "退出系统":
+                                {
+                                    Exit();
+                                    break;
+                                }
+                                case "增开课程":
+                                {
+                                    ta.Teacher::add_course();
+                                    break;
+                                }
+                                case "所有课程":
+                                {
+                                    ta.Student::course_info();
+                                    break;
+                                }
+                                case "增加课程":
+                                {
+                                    ta.Student::add_course();
+                                    break;
+                                }
+                                case "修改密码":
+                                {
+                                    ta.set_password();
+                                    break;
+                                }
+                                case "退出登录":
+                                    goto login;
+                                default:
+                                {
+                                    Course course = courses[Find(courses, now.options_target[k])];
+                                    if (course.is_scoring())
+                                    {
+                                        std::cout << "现在录入成绩? [y/n]";
+                                        ch = getch();
+                                        if (ch == 'y' || ch == 'Y')
+                                        {
+                                            course.update_score();
+                                            break;
+                                        }
+                                    }
+                                    course.display();
+                                    break;
+                                }
                             }
                         }
                     }
@@ -308,11 +529,11 @@ void UpdateUsers()
 
 void UpdateFiles()
 {
-    // 根据用户信息更新文件.
+    // 根据全局vector更新文件.
     WriteAdmins("./data/admins.txt", admins);
-    WriteAdmins("./data/teachers.txt", teachers);
-    WriteAdmins("./data/students.txt", students);
-    WriteAdmins("./data/tas.txt", tas);    
+    WriteTeachers("./data/teachers.txt", teachers);
+    WriteStudents("./data/students.txt", students);
+    WriteTAs("./data/tas.txt", tas);    
 }
 
 void Exit()

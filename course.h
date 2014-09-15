@@ -10,8 +10,10 @@ const int kCourseMaxTeacher = 5;        // 课程老师最大值(包括主讲老
 class Course
 {
 public:
-    Course();
-    ~Course();
+    Course() {}
+    Course(std::string id, std::string name, int credit, bool is_optional, bool is_scoring):
+           id_(id), name_(name), credit_(credit), is_optional_(is_optional), is_scoring_(is_scoring) {}
+    ~Course() {}
 
     std::string id(){ return id_; }
     std::string name(){ return name_; }
@@ -21,6 +23,14 @@ public:
     double avg_score(){ return avg_score_; }
     std::vector<int> teachers(){ return teachers_id_; }
     std::vector<int> students(){ return students_id_; }
+    void add_teacher(int teacher_id);
+    void add_student(int student_id);
+    void update();
+    void display();
+    void update_score();
+    double avg_score();
+
+    friend bool operator ==(Course &c, std::string id){ return (c.id_ == id) || (c.name_ == id); }
 
 private:
     std::string id_;                            // 课程ID
@@ -28,7 +38,6 @@ private:
     int credit_;                                // 学分
     bool is_optional_;                          // 是否任选(非任选则为必修限选课程)
     bool is_scoring_;                           // 是否记分
-    double avg_score_;                          // 该课程平均分(若记分)
     std::vector<int> teachers_id_;      // 老师团队
     std::vector<int> students_id_;      // 学生ID
 };

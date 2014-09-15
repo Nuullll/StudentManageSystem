@@ -2,11 +2,27 @@
 
 #include "user.h"
 #include "file.h"
+#include "course.h"
 #include "main.h"
+#include <algorithm>
 
 void ValidPassword(std::string password)
 {
+    for (int i = 0; i < password.size(); i++)
+    {
+        char ch = password[i];
+        if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9')))
+            return false;
+    }
     return ((password.size() >= 6) && (password.size() <= 15));
+}
+
+std::ofstream &operator <<(std::ofstream &of, const User &user)
+{
+    of << user.identity_ << '\n';
+    of << user.id_ << '\n';
+    of << user.password_ << '\n';
+    return of;
 }
 
 void User::set_password()
@@ -23,7 +39,7 @@ void User::set_password()
     std::string new_pwd = GetPass();
     if (!ValidPassword(new_pwd))
     {
-        HighlightPrint("请设置6~15位密码!\n");
+        HighlightPrint("请设置6~15位数字字母密码!\n");
         return;
     }
     std::cout << "重复新密码: ";
@@ -37,114 +53,6 @@ void User::set_password()
     update();
     std::cout << "设置成功!\n";
     return;
-}
-
-void Administrator::update()
-{
-    Remove(admins, id_);
-    admins.push_back(*this);
-    UpadateFiles();
-    return;
-}
-
-void Teacher::update()
-{
-    Remove(teachers, id_);
-    teachers.push_back(*this);
-    UpdateFiles();
-    return;
-}
-
-void Student::update()
-{
-    Remove(students, id_);
-    students.push_back(*this);
-    UpdateFiles();
-    return;
-}
-
-void TeachingAssistant::update()
-{
-    Remove(tas, id_);
-    tas.push_back(*this);
-    UpdateFiles();
-    return;
-}
-
-std::ofstream &operator <<(std::ofstream &of, const User &user)
-{
-    of << user.identity_ << '\n';
-    of << user.id_ << '\n';
-    of << user.password_ << '\n';
-    return of;
-}
-
-std::ofstream &operator <<(std::ofstream &of, const Administrator &admin)
-{
-    of << User(admin) << '\n';
-    return of;
-}
-
-std::ofstream &operator <<(std::ofstream &of, const Teacher &t)
-{
-    of << User(t);
-    of << t.name_ << '\n';
-    of << "*\n";
-    std::vector<std::string>::iterator it;
-    for(it = t.course_id_.begin(); it != t.course_id_.end(); it++)
-    {
-        of << *it << '\n';
-    }
-    of << "#\n";
-    of << t.is_head_teacher_ << '\n';
-    of << t.class_id_ << '\n\n';
-    return of;
-}
-
-std::ofstream &operator <<(std::ofstream &of, const Student &stu)
-{
-    of << User(stu);
-    of << stu.name_ << '\n';
-    of << stu.class_id_ << '\n';
-    of << "*\n";
-    std::vector<std::string>::iterator it1;
-    for(it1 = stu.course_id_.begin(); it1 != stu.course_id_.end(); it1++)
-    {
-        of << *it1 << '\n';
-    }
-    of << "#\n";
-    of << "*\n";
-    std::vector<Score>::iterator it2;
-    for(it2 = stu.score_.begin(); it2 != stu.score_.end(); it2++)
-    {
-        of << *it2;
-    }
-    of << "#\n";
-    of << '\n';
-    return of;
-}
-
-std::ofstream &operator <<(std::ofstream &of, const TeachingAssistant &ta)
-{
-    of << User(ta);
-    of << ta.name_ << '\n';
-    of << ta.class_id_ << '\n';
-    of << "*\n";
-    std::vector<std::string>::iterator it1;
-    for(it1 = ta.Teacher::course_id().begin(); it1 != ta.Teacher::course_id().end(); it1++)
-    {
-        of << *it1 << '\n';
-    }
-    of << "#\n";
-    of << "*\n";
-    std::vector<std::string>::iterator it2;
-    for(it2 = ta.Student::course_id().begin(); it2 != ta.Student::course_id().end(); it2++)
-    {
-        of << *it2 << '\n';
-    }
-    of << "#\n";
-    of << "\n";
-    return of;
 }
 
 void Administrator::add_user()
@@ -308,3 +216,184 @@ void Administrator::del_user()
     }
     UpdateFiles();
 }
+
+void Administrator::update()
+{
+    admins = Remove(admins, id_);
+    admins.push_back(*this);
+    UpadateFiles();
+    return;
+}
+
+std::ifstream &operator >>(std::ifstream &in, Administrator &admin)
+{
+    in >> admin.identity_;
+    in >> admin.id_;
+    in >> admin.password_;
+    return in;
+}
+
+std::ofstream &operator <<(std::ofstream &of, const Administrator &admin)
+{
+    of << User(admin) << '\n';
+    return of;
+}
+
+void Teacher::add_course()
+{
+    ClearScreen();
+    HighlightPrint("开设一门课程!\n");
+    std::cout << "课程ID: ";
+    std::string new_id, new_name;
+    int credit;
+    bool is_optional, is_scoring;
+    std::cin >> new_id;
+    if (Find(courses, new_id) >= 0)     // id符合
+    {
+        course_id_.push_back(courses[Find(courses, new_id)]);
+        courses[Find(courses, new_id)].add_teacher(id_);
+        update();
+        return;
+    }
+    else
+    {
+        std::cout << "正在创建一门新课程...\n";
+        std::cout << "课程名称: ";
+        if (!(std::cin >> new_name))
+            HighlightPrint("输入错误! \n"), return;
+        std::cout << "学分: ";
+        if (!(std::cin >> credit))
+            HighlightPrint("输入错误! \n"), return;
+        std::cout << "选修课? [0/1] ";
+        if (!(std::cin >> is_optional))
+            HighlightPrint("输入错误! \n"), return;
+        std::cout << "是否记分? [0/1] ";
+        if (!(std::cin >> is_scoring))
+            HighlightPrint("输入错误! \n"), return;
+        Course new_course(new_id, new_name, credit, is_optional, is_scoring);
+        new_course.add_teacher(id_);
+        courses.push_back(new_course);
+        WriteCourses("./data/courses.txt", courses);
+        course_id_.push_back(new_id);
+        update();
+        return;
+    }
+}
+
+void Teacher::display_class()
+{
+    std::vector<Student> my_class;
+    for (std::vector<Student>::iterator it = students.begin(); it != students.end(); it++)
+    {
+        if (it->class_id() == class_id_)
+            my_class.push_back(*it);
+    }
+    for (std::vector<TeachingAssistant>::iterator it = tas.begin(); it != tas.end(); it++)
+    {
+        if (it->Student::class_id() == class_id_)
+            my_class.push_back(*it);
+    }
+    sort(my_class.begin(), my_class.end(), CompareStudent);
+    ClearScreen();
+    HighlightPrint(class_id_ + '\n');
+    std::cout << "[按GPA排序]\n";
+    for (std::vector<Student>::iterator it = my_class.begin(); it != my_class.end(); it++)
+        it->display_gpa_info();
+    getch();
+    return;
+}
+
+void Teacher::update()
+{
+    teachers = Remove(teachers, id_);
+    teachers.push_back(*this);
+    UpdateFiles();
+    return;
+}
+
+void Student::update()
+{
+    students = Remove(students, id_);
+    students.push_back(*this);
+    UpdateFiles();
+    return;
+}
+
+bool CompareStudent(Student stu1, Student stu2)
+{
+    return stu1.gpa() > stu2.gpa();
+}
+
+void TeachingAssistant::update()
+{
+    tas = Remove(tas, id_);
+    tas.push_back(*this);
+    UpdateFiles();
+    return;
+}
+
+
+
+std::ofstream &operator <<(std::ofstream &of, const Teacher &t)
+{
+    of << User(t);
+    of << t.name_ << '\n';
+    of << "*\n";
+    std::vector<std::string>::iterator it;
+    for(it = t.course_id_.begin(); it != t.course_id_.end(); it++)
+    {
+        of << *it << '\n';
+    }
+    of << "#\n";
+    of << t.is_head_teacher_ << '\n';
+    of << t.class_id_ << '\n\n';
+    return of;
+}
+
+std::ofstream &operator <<(std::ofstream &of, const Student &stu)
+{
+    of << User(stu);
+    of << stu.name_ << '\n';
+    of << stu.class_id_ << '\n';
+    of << "*\n";
+    std::vector<std::string>::iterator it1;
+    for(it1 = stu.course_id_.begin(); it1 != stu.course_id_.end(); it1++)
+    {
+        of << *it1 << '\n';
+    }
+    of << "#\n";
+    of << "*\n";
+    std::vector<Score>::iterator it2;
+    for(it2 = stu.score_.begin(); it2 != stu.score_.end(); it2++)
+    {
+        of << *it2;
+    }
+    of << "#\n";
+    of << '\n';
+    return of;
+}
+
+std::ofstream &operator <<(std::ofstream &of, const TeachingAssistant &ta)
+{
+    of << User(ta);
+    of << ta.name_ << '\n';
+    of << ta.class_id_ << '\n';
+    of << "*\n";
+    std::vector<std::string>::iterator it1;
+    for(it1 = ta.Teacher::course_id().begin(); it1 != ta.Teacher::course_id().end(); it1++)
+    {
+        of << *it1 << '\n';
+    }
+    of << "#\n";
+    of << "*\n";
+    std::vector<std::string>::iterator it2;
+    for(it2 = ta.Student::course_id().begin(); it2 != ta.Student::course_id().end(); it2++)
+    {
+        of << *it2 << '\n';
+    }
+    of << "#\n";
+    of << "\n";
+    return of;
+}
+
+
