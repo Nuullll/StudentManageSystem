@@ -20,20 +20,19 @@ class User
 public:
     friend class Token;
     User() {}
-    User(UserType identity, int id, std::string password): identity_(identity), id_(id), password_(password) {}
+    User(int identity, int id, std::string password): identity_(identity), id_(id), password_(password) {}
     virtual ~User() {}
 
     virtual void print() = 0;
     virtual void update() = 0;  // 更新全局vector
-    friend bool operator ==(User &u, int id){ return u.id_ == id; }
     friend std::ofstream &operator <<(std::ofstream &of, const User &u);
+    bool operator ==(const int &id){ return id_ == id; }
     int id() { return id_; }
-    UserType identity() { return identity_; }
+    int identity() { return identity_; }
     void set_password();
 
-
 protected:
-    UserType identity_;         // 用户身份
+    int identity_;         // 用户身份
     int id_;                    // 用户ID
     std::string password_;      // 登录管理系统所用密码
 };
@@ -51,7 +50,7 @@ public:
     void del_user();    // 删除用户
     void print() { std::cout << "管理员: " << id_ << std::endl; }
     void update();
-  
+
     friend std::ifstream &operator >>(std::ifstream &in, Administrator &admin);
     friend std::ofstream &operator <<(std::ofstream &of, const Administrator &admin);
 };
@@ -68,7 +67,7 @@ public:
     bool is_head_teacher() { return is_head_teacher_; }
     std::string class_id() { return class_id_; }
     std::string name() { return name_; }
-    std::vector<std::string> course_id() { return course_id_; }
+    std::vector<std::string> course_id() const { return course_id_; }
     void add_course();
     void display_class();
     void print() { std::cout << name_ << "老师" << std::endl; }
@@ -100,7 +99,7 @@ public:
     std::string class_id() { return class_id_; }
     std::string name() { return name_; }
     std::vector<Score> score() { return score_; }
-    std::vector<std::string> course_id() { return course_id_; }
+    std::vector<std::string> course_id() const { return course_id_; }
     void add_course();
     void add_score(Score score);
     void course_info();

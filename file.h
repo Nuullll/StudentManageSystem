@@ -4,23 +4,19 @@
 #ifndef FILE_H
 #define FILE_H 
 
-#include <string>
-#include <vector>
-#include "course.h"
-#include "user.h"
 
 // user info
-void WriteAdmins(char* filename, std::vector<Administrator> admins);
-void WriteTeachers(char* filename, std::vector<Teacher> teachers);
-void WriteStudents(char* filename, std::vector<Student> students);
-void WriteTAs(char* filename, std::vector<TeachingAssistant> tas);
-void ReadAdmins(char* filename);
-void ReadTeachers(char* filename);
-void ReadStudents(char* filename);
-void ReadTAs(char* filename);
+void WriteAdmins();
+void WriteTeachers();
+void WriteStudents();
+void WriteTAs();
+void ReadAdmins();
+void ReadTeachers();
+void ReadStudents();
+void ReadTAs();
 void ReadUsers();
 
-void WriteCourses(char* filename, std::vector<Course> courses);
-void ReadCourses(char* filename);
+void WriteCourses();
+void ReadCourses();
 
 #endif

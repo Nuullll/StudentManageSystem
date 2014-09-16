@@ -11,13 +11,13 @@ class Token
 {
 public:
 	Token() {}
-	Token(std::string id, std::string password): id_(id), password_(password) {}
+	Token(int id, std::string password): id_(id), password_(password) {}
     ~Token() {}
-    std::string id() { return id_; }
+    int id() { return id_; }
 	User* auth(const std::vector<User*> users);
 
 private:
-	std::string id_;
+	int id_;
 	std::string password_;
 };
 

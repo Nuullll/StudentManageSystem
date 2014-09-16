@@ -1,96 +1,91 @@
 // main.cpp
 
+#include "global.h"
 #include "file.h"
-#include "main.h"
 #include "token.h"
 #include "user.h"
 #include <conio.h>
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
-
-#define UP 72
-#define DOWN 80
-#define LEFT 75
-#define RIGHT 77
-
-UpdateUsers();
+#include <map>
 
 int main(int argc, char const *argv[])
 {
-login:              // ç™»å½•æ ‡ç­¾.
-    ClearScreen();      // ä¿ç•™è½¯ä»¶æ ‡é¢˜çš„æ¸…å±å‡½æ•°.
-    Token tmp;      // è·å–ç™»å½•ä¿¡æ¯çš„ä»¤ç‰Œ.
-    User* user;     // å½“å‰ç™»å½•çš„ç”¨æˆ·.
+login:              // µÇÂ¼±êÇ©.
+	UpdateUsers();
+    ClearScreen();      // ±£ÁôÈí¼ş±êÌâµÄÇåÆÁº¯Êı.
+    Token tmp;      // »ñÈ¡µÇÂ¼ĞÅÏ¢µÄÁîÅÆ.
+    User* user;     // µ±Ç°µÇÂ¼µÄÓÃ»§.
     while (true)
     {
-        tmp = Login();  // ä»é”®ç›˜è·å–ç™»å½•ä¿¡æ¯.
+        tmp = Login();  // ´Ó¼üÅÌ»ñÈ¡µÇÂ¼ĞÅÏ¢.
         if ((user = tmp.auth(users)) != NULL)
         {
-            std::cout << "ç™»å½•æˆåŠŸ!\n";
-            std::cout << "æ¬¢è¿";
-            user->print();  // æ˜¾ç¤ºç”¨æˆ·åŸºæœ¬ä¿¡æ¯.
+            std::cout << "µÇÂ¼³É¹¦!\n";
+            std::cout << "»¶Ó­";
+            user->print();  // ÏÔÊ¾ÓÃ»§»ù±¾ĞÅÏ¢.
             break;
         }
         else
         {
-            ClearScreen();  // æ¸…å±æ˜¾ç¤ºé”™è¯¯.
-            std::cout << "å­¦å·(å·¥å·)æˆ–å¯†ç é”™è¯¯! é‡æ–°è¾“å…¥? \n";
-            std::cout << "[å›è½¦ç»§ç»­, qé€€å‡ºç³»ç»Ÿ] ";
-            if (getch() == 'q')     // é€€å‡ºç³»ç»Ÿ.
+            ClearScreen();  // ÇåÆÁÏÔÊ¾´íÎó.
+            std::cout << "Ñ§ºÅ(¹¤ºÅ)»òÃÜÂë´íÎó! ÖØĞÂÊäÈë? \n";
+            std::cout << "[»Ø³µ¼ÌĞø, qÍË³öÏµÍ³] ";
+            if (getch() == 'q')     // ÍË³öÏµÍ³.
             {
-                std::cout << "å†è§! \n";
+                std::cout << "ÔÙ¼û! \n";
                 return 0;
             }
         }
-    }       // ç™»å½•æˆåŠŸ.
-    // æ ¹æ®ç”¨æˆ·èº«ä»½åˆå§‹åŒ–èœå•.
+    }       // µÇÂ¼³É¹¦.
+    // ¸ù¾İÓÃ»§Éí·İ³õÊ¼»¯²Ëµ¥.
     switch (user->identity())
     {
-        // ç®¡ç†å‘˜èœå•.
+        // ¹ÜÀíÔ±²Ëµ¥.
         case ADMINISTRATOR:
         {
             Administrator admin;
-            admin = admins[Find(admins, tmp.id())];     // ä»adminsä¸­è¯»å–å½“å‰ç™»å½•çš„adminä¿¡æ¯.
-            MenuNode top_menu, manager_menu, user_menu;     // ç®¡ç†å‘˜èœå•.
+            admin = admins[Find(admins, tmp.id())];     // ´ÓadminsÖĞ¶ÁÈ¡µ±Ç°µÇÂ¼µÄadminĞÅÏ¢.
+            MenuNode top_menu, manager_menu, user_menu;     // ¹ÜÀíÔ±²Ëµ¥.
             top_menu.previous = manager_menu.previous = user_menu.previous = &top_menu;
-            top_menu.append("ç”¨æˆ·ç®¡ç†", &manager_menu);
-            top_menu.append("ä¸ªäººä¸­å¿ƒ", &user_menu);
-            top_menu.append("é€€å‡ºç³»ç»Ÿ", NULL);
-            manager_menu.append("æ–°ç”¨æˆ·æ³¨å†Œ", NULL);
-            manager_menu.append("åˆ é™¤ç”¨æˆ·", NULL);
-            user_menu.append("ä¿®æ”¹å¯†ç ", NULL);
-            user_menu.append("é€€å‡ºç™»å½•", NULL);
-            MenuNode now = top_menu;    // å½“å‰æ˜¾ç¤ºèœå•.
-            int k = 0;                  // èœå•é¡¹ç›®ç´¢å¼•.
+            top_menu.append("ÓÃ»§¹ÜÀí", &manager_menu);
+            top_menu.append("¸öÈËÖĞĞÄ", &user_menu);
+            top_menu.append("ÍË³öÏµÍ³", NULL);
+            manager_menu.append("ĞÂÓÃ»§×¢²á", NULL);
+            manager_menu.append("É¾³ıÓÃ»§", NULL);
+            user_menu.append("ĞŞ¸ÄÃÜÂë", NULL);
+            user_menu.append("ÍË³öµÇÂ¼", NULL);
+            MenuNode now = top_menu;    // µ±Ç°ÏÔÊ¾²Ëµ¥.
+            int k = 0;                  // ²Ëµ¥ÏîÄ¿Ë÷Òı.
             while (true)
             {
-                now.show(k);    // å±•ç¤ºèœå•, ç¬¬ké¡¹é«˜äº®æ˜¾ç¤º
-                int ch = getch();   // è·å–é”®ç›˜è¾“å…¥(éç¼“å†²)
-                if (ch == 13)   // å›è½¦é”®, ç­‰ä»·ä¸æ–¹å‘é”®å³
+                now.show(k);    // Õ¹Ê¾²Ëµ¥, µÚkÏî¸ßÁÁÏÔÊ¾
+                int ch = getch();   // »ñÈ¡¼üÅÌÊäÈë(·Ç»º³å)
+                if (ch == 13)   // »Ø³µ¼ü, µÈ¼ÛÓë·½Ïò¼üÓÒ
                     goto admin_right;
-                if (ch == 27)   // ESCé”®, ç­‰ä»·äºæ–¹å‘é”®å·¦
+                if (ch == 27)   // ESC¼ü, µÈ¼ÛÓÚ·½Ïò¼ü×ó
                     goto admin_left;
-                while (ch != 224)   // æ–¹å‘é”®éœ€getch()ä¸¤æ¬¡.
+                while (ch != 224)   // ·½Ïò¼üĞègetch()Á½´Î.
                     ;
                 switch (getch())
                 {
                     case UP:
                     {
                         if (--k < 0)
-                            k = now.options_target.size() - 1; // é€‰ä¸­æœ€åä¸€é¡¹.
+                            k = now.options_target.size() - 1; // Ñ¡ÖĞ×îºóÒ»Ïî.
                         break;
                     }
                     case DOWN:
                     {
                         if (++k > now.options_target.size() - 1)
-                            k = 0;  // é€‰ä¸­ç¬¬ä¸€é¡¹.
+                            k = 0;  // Ñ¡ÖĞµÚÒ»Ïî.
                         break;
                     }
                     case LEFT:
                     {
 admin_left:
-                        now = *now.previous;    // è¿”å›ä¸Šçº§èœå•.
+                        now = *now.previous;    // ·µ»ØÉÏ¼¶²Ëµ¥.
                         k = 0;
                         break;
                     }
@@ -99,29 +94,35 @@ admin_left:
 admin_right:
                         if (now.options_target[k] == NULL)
                         {
-                            switch (now.options_text[k])
+							std::map<std::string, int> mp;
+							mp["ÍË³öÏµÍ³"] = 0;
+							mp["ĞÂÓÃ»§×¢²á"] = 1;
+							mp["É¾³ıÓÃ»§"] = 2;
+                            mp["ĞŞ¸ÄÃÜÂë"] = 3;
+                            mp["ÍË³öµÇÂ¼"] = 4;
+                            switch (mp[now.options_text[k]])
                             {
-                                case "é€€å‡ºç³»ç»Ÿ":
+                                case 0:
                                 {
                                     Exit();
                                     break;
                                 }
-                                case "æ–°ç”¨æˆ·æ³¨å†Œ":
+                                case 1:
                                 {
                                     admin.add_user();
                                     break;
                                 }
-                                case "åˆ é™¤ç”¨æˆ·":
+                                case 2:
                                 {
                                     admin.del_user();
                                     break;
                                 }
-                                case "ä¿®æ”¹å¯†ç ":
+                                case 3:
                                 {
                                     admin.set_password();
                                     break;
                                 }
-                                case "é€€å‡ºç™»å½•":
+                                case 4:
                                     goto login;
                                 default:
                                     break;
@@ -141,23 +142,23 @@ admin_right:
                 }
             }
         }
-        // æ•™å¸ˆèœå•.
+        // ½ÌÊ¦²Ëµ¥.
         case TEACHER:
         {
             Teacher teacher;
             teacher = teachers[Find(teachers, tmp.id())];
             MenuNode top_menu, course_menu, user_menu;
-            top_menu.previous = course_menu.previous = class_menu.previous = user_menu.previous = &top_menu;
-            top_menu.append("è¯¾ç¨‹ç®¡ç†", &course_menu);
+            top_menu.previous = course_menu.previous = user_menu.previous = &top_menu;
+            top_menu.append("¿Î³Ì¹ÜÀí", &course_menu);
             if (teacher.is_head_teacher())
-                top_menu.append("æŸ¥çœ‹ç­çº§", NULL);
-            top_menu.append("ä¸ªäººä¸­å¿ƒ", &user_menu);
-            top_menu.append("é€€å‡ºç³»ç»Ÿ", NULL);
+                top_menu.append("²é¿´°à¼¶", NULL);
+            top_menu.append("¸öÈËÖĞĞÄ", &user_menu);
+            top_menu.append("ÍË³öÏµÍ³", NULL);
             for (int i = 0; i < teacher.course_id().size(); i++)
                 course_menu.append(courses[Find(courses, teacher.course_id()[i])].name(), NULL);
-            course_menu.append("å¢å¼€è¯¾ç¨‹", NULL);
-            user_menu.append("ä¿®æ”¹å¯†ç ", NULL);
-            user_menu.append("é€€å‡ºç™»å½•", NULL);
+            course_menu.append("Ôö¿ª¿Î³Ì", NULL);
+            user_menu.append("ĞŞ¸ÄÃÜÂë", NULL);
+            user_menu.append("ÍË³öµÇÂ¼", NULL);
             MenuNode now = top_menu;
             int k = 0;
             while (true)
@@ -196,36 +197,42 @@ teacher_left:
 teacher_right:
                         if (now.options_target[k] == NULL)
                         {
-                            switch (now.options_text[k])
+                            std::map<std::string, int> mp;
+                            mp["ÍË³öÏµÍ³"] = 0;
+                            mp["²é¿´°à¼¶"] = 1;
+                            mp["Ôö¿ª¿Î³Ì"] = 2;
+                            mp["ĞŞ¸ÄÃÜÂë"] = 3;
+                            mp["ÍË³öµÇÂ¼"] = 4;
+                            switch (mp[now.options_text[k]])
                             {
-                                case "é€€å‡ºç³»ç»Ÿ":
+                                case 0:
                                 {
                                     Exit();
                                     break;
                                 }
-                                case "æŸ¥çœ‹ç­çº§":
+                                case 1:
                                 {
-                                    teacher.diplay_class();
+                                    teacher.display_class();
                                     break;
                                 }
-                                case "å¢å¼€è¯¾ç¨‹":
+                                case 2:
                                 {
                                     teacher.add_course();
                                     break;
                                 }
-                                case "ä¿®æ”¹å¯†ç ":
+                                case 3:
                                 {
                                     teacher.set_password();
                                     break;
                                 }
-                                case "é€€å‡ºç™»å½•":
+                                case 4:
                                     goto login;
                                 default:
                                 {
-                                    Course course = courses[Find(courses, now.options_target[k])];
+                                    Course course = courses[Find(courses, now.options_text[k])];
                                     if (course.is_scoring())
                                     {
-                                        std::cout << "ç°åœ¨å½•å…¥æˆç»©? [y/n]";
+                                        std::cout << "ÏÖÔÚÂ¼Èë³É¼¨? [y/n]";
                                         ch = getch();
                                         if (ch == 'y' || ch == 'Y')
                                         {
@@ -252,19 +259,19 @@ teacher_right:
                 }
             }
         }
-        // å­¦ç”Ÿèœå•.
+        // Ñ§Éú²Ëµ¥.
         case STUDENT:
         {
             Student student;
             student = students[Find(students, tmp.id())];
             MenuNode top_menu, user_menu;
             top_menu.previous = user_menu.previous = &top_menu;
-            top_menu.append("æ‰€æœ‰è¯¾ç¨‹", NULL);
-            top_menu.append("å¢åŠ è¯¾ç¨‹", NULL);
-            top_menu.append("ä¸ªäººä¸­å¿ƒ", &user_menu);
-            top_menu.append("é€€å‡ºç³»ç»Ÿ", NULL);
-            user_menu.append("ä¿®æ”¹å¯†ç ", NULL);
-            user_menu.append("é€€å‡ºç™»å½•", NULL);
+            top_menu.append("ËùÓĞ¿Î³Ì", NULL);
+            top_menu.append("Ôö¼Ó¿Î³Ì", NULL);
+            top_menu.append("¸öÈËÖĞĞÄ", &user_menu);
+            top_menu.append("ÍË³öÏµÍ³", NULL);
+            user_menu.append("ĞŞ¸ÄÃÜÂë", NULL);
+            user_menu.append("ÍË³öµÇÂ¼", NULL);
             MenuNode now = top_menu;
             int k = 0;
             while (true)
@@ -303,29 +310,35 @@ student_left:
                         student_right:
                         if (now.options_target[k] == NULL)
                         {
-                            switch (now.options_text[k])
+                            std::map<std::string, int> mp;
+                            mp["ËùÓĞ¿Î³Ì"] = 0;
+                            mp["Ôö¼Ó¿Î³Ì"] = 1;
+                            mp["ÍË³öÏµÍ³"] = 2;
+                            mp["ĞŞ¸ÄÃÜÂë"] = 3;
+                            mp["ÍË³öµÇÂ¼"] = 4;
+                            switch (mp[now.options_text[k]])
                             {
-                                case "æ‰€æœ‰è¯¾ç¨‹":
+                                case 0:
                                 {
                                     student.course_info();
                                     break;
                                 }
-                                case "å¢åŠ è¯¾ç¨‹":
+                                case 1:
                                 {
                                     student.add_course();
                                     break;
                                 }
-                                case "é€€å‡ºç³»ç»Ÿ":
+                                case 2:
                                 {
                                     Exit();
                                     break;
                                 }
-                                case "ä¿®æ”¹å¯†ç ":
+                                case 3:
                                 {
                                     student.set_password();
                                     break;
                                 }
-                                case "é€€å‡ºç™»å½•":
+                                case 4:
                                     goto login;
                                 default:
                                     break;
@@ -345,24 +358,24 @@ student_left:
                 }
             }
         }
-        // åŠ©æ•™èœå•
+        // Öú½Ì²Ëµ¥
         case TEACHING_ASSISTANT:
         {
             TeachingAssistant ta;
             ta = tas[Find(tas, tmp.id())];
             MenuNode top_menu, teacher_menu, student_menu, user_menu;
             top_menu.previous = teacher_menu.previous = student_menu.previous = user_menu.previous = &top_menu;
-            top_menu.append("æ•™å¸ˆç•Œé¢", &teacher_menu);
-            top_menu.append("å­¦ç”Ÿç•Œé¢", &student_menu);
-            top_menu.append("ä¸ªäººä¸­å¿ƒ", &user_menu);
-            top_menu.append("é€€å‡ºç³»ç»Ÿ", NULL);
+            top_menu.append("½ÌÊ¦½çÃæ", &teacher_menu);
+            top_menu.append("Ñ§Éú½çÃæ", &student_menu);
+            top_menu.append("¸öÈËÖĞĞÄ", &user_menu);
+            top_menu.append("ÍË³öÏµÍ³", NULL);
             for (int i = 0; i < ta.Teacher::course_id().size(); i++)
                 teacher_menu.append(courses[Find(courses, ta.Teacher::course_id()[i])].name(), NULL);
-            teacher_menu.append("å¢å¼€è¯¾ç¨‹", NULL);
-            student_menu.append("æ‰€æœ‰è¯¾ç¨‹", NULL);
-            student_menu.append("å¢åŠ è¯¾ç¨‹", NULL);
-            user_menu.append("ä¿®æ”¹å¯†ç ", NULL);
-            user_menu.append("é€€å‡ºç™»å½•", NULL);
+            teacher_menu.append("Ôö¿ª¿Î³Ì", NULL);
+            student_menu.append("ËùÓĞ¿Î³Ì", NULL);
+            student_menu.append("Ôö¼Ó¿Î³Ì", NULL);
+            user_menu.append("ĞŞ¸ÄÃÜÂë", NULL);
+            user_menu.append("ÍË³öµÇÂ¼", NULL);
             MenuNode now = top_menu;
             int k = 0;
             while (true)
@@ -401,41 +414,48 @@ ta_left:
 ta_right:
                         if (now.options_target[k] == NULL)
                         {
-                            switch (now.options_text[k])
+                            std::map<std::string, int> mp;
+                            mp["ÍË³öÏµÍ³"] = 0;
+                            mp["Ôö¿ª¿Î³Ì"] = 1;
+                            mp["ËùÓĞ¿Î³Ì"] = 2;
+                            mp["Ôö¼Ó¿Î³Ì"] = 3;
+                            mp["ĞŞ¸ÄÃÜÂë"] = 4;
+                            mp["ÍË³öµÇÂ¼"] = 5;
+                            switch (mp[now.options_text[k]])
                             {
-                                case "é€€å‡ºç³»ç»Ÿ":
+                                case 0:
                                 {
                                     Exit();
                                     break;
                                 }
-                                case "å¢å¼€è¯¾ç¨‹":
+                                case 1:
                                 {
                                     ta.Teacher::add_course();
                                     break;
                                 }
-                                case "æ‰€æœ‰è¯¾ç¨‹":
+                                case 2:
                                 {
                                     ta.Student::course_info();
                                     break;
                                 }
-                                case "å¢åŠ è¯¾ç¨‹":
+                                case 3:
                                 {
                                     ta.Student::add_course();
                                     break;
                                 }
-                                case "ä¿®æ”¹å¯†ç ":
+                                case 4:
                                 {
                                     ta.set_password();
                                     break;
                                 }
-                                case "é€€å‡ºç™»å½•":
+                                case 5:
                                     goto login;
                                 default:
                                 {
-                                    Course course = courses[Find(courses, now.options_target[k])];
+                                    Course course = courses[Find(courses, now.options_text[k])];
                                     if (course.is_scoring())
                                     {
-                                        std::cout << "ç°åœ¨å½•å…¥æˆç»©? [y/n]";
+                                        std::cout << "ÏÖÔÚÂ¼Èë³É¼¨? [y/n]";
                                         ch = getch();
                                         if (ch == 'y' || ch == 'Y')
                                         {
@@ -454,95 +474,4 @@ ta_right:
         }
     }
     return 0;
-}
-
-std::string GetPass()
-{
-    std::string pwd;
-    char tmp;
-    while ((tmp = getch()) != 13)
-    {
-        pwd.append(1, tmp);
-        std::cout << '*';
-    }
-    std::cout << '\n';
-    return pwd;
-}
-
-Token Login()
-{
-    std::cout << "è¯·ç™»å½•\n";
-    std::string id, pwd;
-    std::cout << "è¯·è¾“å…¥æ‚¨çš„å­¦å·(å·¥å·): ";
-    std::cin >> id;
-    std::cout << "è¯·è¾“å…¥æ‚¨çš„å¯†ç : ";
-    pwd = GetPass();
-    return Token(id, pwd);
-}
-
-void ClearScreen()
-{
-    system("cls");
-    Title();
-}
-
-void Exit()
-{
-    ClearScreen();  // æ¸…å±
-    std::cout << "ç¡®è®¤é€€å‡º? [y/n]" << std::endl;
-    ch = getch();
-    if (ch == 'y' or ch == 'Y')
-    {
-        std::cout << "å†è§!" << std::endl;
-        return 0;
-    }
-}
-
-void Title()
-{
-	std::cout << "å­¦ç”Ÿæˆç»©ç®¡ç†ç³»ç»Ÿ v1.60.0\n\n";
-}
-
-void UpdateFiles()
-{
-    // æ ¹æ®å…¨å±€vectoræ›´æ–°æ–‡ä»¶.
-    WriteAdmins("./data/admins.txt", admins);
-    WriteTeachers("./data/teachers.txt", teachers);
-    WriteStudents("./data/students.txt", students);
-    WriteTAs("./data/tas.txt", tas);    
-}
-
-void UpdateUsers()
-{
-    // ä»æ–‡ä»¶è¯»å–ç”¨æˆ·ä¿¡æ¯.
-    ReadUsers("./data");
-    ReadAdmins("./data/admins.txt");
-    ReadTeachers("./data/teachers.txt");
-    ReadStudents("./data/students.txt");
-    ReadTAs("./data/tas.txt");
-}
-
-template <class A, class B>
-int Find(std::vector<A> v, B id)
-{
-    for (int i = 0; i < v.size(); i++)
-    {
-        if (v[i] == id)
-            return i;
-    }
-    return -1;
-}
-
-template <class T>
-std::vector<T> Remove(std::vector<T> v, int id)
-{
-    for (std::vector<T>::iterator it = v.begin(); it != v.end(); it++)
-    {
-        if (it->id() == id)
-        {
-            v.erase(it);
-            break;
-        }
-    }
-    return v;
 }

@@ -1,14 +1,15 @@
 // course.cpp
 
 #include "course.h"
+#include "user.h"
 #include "file.h"
-#include "main.h"
+#include "global.h"
 
 void Course::add_teacher(int teacher_id)
 {
     teacher_id_.push_back(teacher_id);
     update();
-    WriteCourses("./data/courses.txt", courses);
+    WriteCourses();
     return;
 }
 
@@ -16,7 +17,7 @@ void Course::add_student(int student_id)
 {
     student_id_.push_back(student_id);
     update();
-    WriteCourses("./data/courses.txt", courses);
+    WriteCourses();
     return;
 }
 
@@ -24,7 +25,7 @@ void Course::update()
 {
     courses = Remove(courses, id_);
     courses.push_back(*this);
-    WriteCourses("./data/courses.txt", courses);
+    WriteCourses();
     return;
 }
 
@@ -33,17 +34,17 @@ void Course::display()
     ClearScreen();
     std::cout << id_ << ' ';
     std::cout << name_ << ' ';
-    std::cout << credit_ << "å­¦åˆ† ";
+    std::cout << credit_ << "Ñ§·Ö ";
     if (!is_scoring_)
-        std::cout << "ä¸è®°åˆ† ";
+        std::cout << "²»¼Ç·Ö ";
     if (is_optional_)
-        std::cout << "é€‰ä¿®è¯¾ç¨‹ \n";
+        std::cout << "Ñ¡ĞŞ¿Î³Ì \n";
     else
-        std::cout << "å¿…é™è¯¾ç¨‹ \n";
-    HighlightPrint("è®²å¸ˆ: \n");
+        std::cout << "±ØÏŞ¿Î³Ì \n";
+    HighlightPrint("½²Ê¦: \n");
     for (std::vector<int>::iterator it = teacher_id_.begin(); it != teacher_id_.end(); it++)
         teachers[Find(teachers, *it)].print();
-    HighlightPrint("å­¦ç”Ÿ: \n");
+    HighlightPrint("Ñ§Éú: \n");
     for (std::vector<int>::iterator it = student_id_.begin(); it != student_id_.end(); it++)
     {   
         Student stu = students[Find(students, *it)];
@@ -53,7 +54,7 @@ void Course::display()
         {
             std::cout << stu.id() << ' ';
             std::cout << stu.name() << ' ';
-            std::cout << stu.score()[Find(stu.score(), id_)].num << std::endl;
+            std::cout << stu.score()[Find(stu.score(), id_)].num() << std::endl;
         }
     }
     return;
@@ -62,30 +63,34 @@ void Course::display()
 void Course::update_score()
 {
     ClearScreen();
-    HighlightPrint("å½•å…¥æˆç»©ä¸­...\n");
+    HighlightPrint("Â¼Èë³É¼¨ÖĞ...\n");
     for (std::vector<int>::iterator it = student_id_.begin(); it != student_id_.end(); it++)
     {
         Student stu = students[Find(students, *it)];
         std::cout << stu.id() << ' ';
         std::cout << stu.name() << ' ';
-        std::cout << "æˆç»©: ";
-        int num;
+        std::cout << "³É¼¨: ";
+        int num = 0;
         if (!std::cin >> num)
         {
-            HighlightPrint("è¾“å…¥é”™è¯¯!\n");
+            HighlightPrint("ÊäÈë´íÎó!\n");
             return;
         }
         stu.add_score(Score(id_, num));
         stu.update();
     }
-    HighlightPrint("å½•å…¥å®Œæ¯•!\n");
+    HighlightPrint("Â¼ÈëÍê±Ï!\n");
     getch();
     return;
 }
 
 std::ifstream &operator >>(std::ifstream &in, Course &c)
 {
-    in >> c.id_ >> c.name_ >> c.credit >> c.is_optional >> c.is_scoring;
+    in >> c.id_;
+	in >> c.name_;
+	in >> c.credit_;
+	in >> c.is_optional_;
+	in >> c.is_scoring_;
     char start_flag;
     while ((start_flag = getch()) == '\n')
         ;
@@ -134,14 +139,14 @@ std::ofstream &operator <<(std::ofstream &of, const Course &c)
 {
     of << c.id_ << '\n';
     of << c.name_ << '\n';
-    of << c.credit << '\n';
-    of << c.is_optional << '\n';
-    of << c.is_scoring << '\n';
+    of << c.credit_ << '\n';
+    of << c.is_optional_ << '\n';
+    of << c.is_scoring_ << '\n';
     of << "*\n";
-    for (std::vector<int>::iterator it = c.teacher_id_.begin(); it != c.teacher_id_.end(); it++)
+    for (std::vector<int>::const_iterator it = c.teacher_id_.begin(); it != c.teacher_id_.end(); it++)
         of << *it << '\n';
     of << "#\n";
-    for (std::vector<int>::iterator it = c.student_id_.begin(); it != c.student_id_.end(); it++)
+    for (std::vector<int>::const_iterator it = c.student_id_.begin(); it != c.student_id_.end(); it++)
         of << *it << '\n';
     of << "#\n\n";
     return of;

@@ -5,7 +5,6 @@
 #include <string>
 #include <windows.h>
 #include <vector>
-#include "user.h"
 
 bool HighlightPrint(std::string text);
 

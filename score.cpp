@@ -1,7 +1,7 @@
 //score.cpp
 
 #include "score.h"
-#include "main.h"
+#include "global.h"
 #include <algorithm>
 
 bool CompareScore(Score s1, Score s2)
@@ -13,7 +13,7 @@ int Score::rank()
 {
     Course course = courses[Find(courses, course_id_)];
     std::vector<Score> scores;
-    for (std::vector<int>::iterator it = course.students().begin(); it != course.students().end(); it++)
+    for (std::vector<int>::iterator it = course.student_id().begin(); it != course.student_id().end(); it++)
     {
         Student stu = students[Find(students, *it)];
         scores.push_back(stu.score()[Find(stu.score(), course_id_)]);

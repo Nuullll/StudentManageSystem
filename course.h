@@ -20,9 +20,8 @@ public:
     int credit(){ return credit_; }
     bool is_optional(){ return is_optional_; }
     bool is_scoring(){ return is_scoring_; }
-    double avg_score(){ return avg_score_; }
-    std::vector<int> teachers(){ return teachers_id_; }
-    std::vector<int> students(){ return students_id_; }
+    std::vector<int> teacher_id(){ return teacher_id_; }
+    std::vector<int> student_id(){ return student_id_; }
     void add_teacher(int teacher_id);
     void add_student(int student_id);
     void update();

@@ -1,12 +1,12 @@
 // user.cpp
 
 #include "user.h"
-#include "file.h"
 #include "course.h"
-#include "main.h"
+#include "global.h"
 #include <algorithm>
+#include "file.h"
 
-void ValidPassword(std::string password)
+bool ValidPassword(std::string password)
 {
     for (int i = 0; i < password.size(); i++)
     {
@@ -15,14 +15,6 @@ void ValidPassword(std::string password)
             return false;
     }
     return ((password.size() >= 6) && (password.size() <= 15));
-}
-
-std::ofstream &operator <<(std::ofstream &of, const User &user)
-{
-    of << user.identity_ << '\n';
-    of << user.id_ << '\n';
-    of << user.password_ << '\n';
-    return of;
 }
 
 void User::set_password()
@@ -105,8 +97,8 @@ void Administrator::add_user()
     int new_id = 0;
     for (std::vector<User*>::iterator it = users.begin(); it != users.end(); it++)
     {
-        if (new_id <= it->id())
-            new_id = it->id() + 1;
+        if (new_id <= (*it)->id())
+            new_id = (*it)->id() + 1;
     }
     std::cout << "学号(工号): " << new_id << std::endl;
     std::cout << "请输入姓名: ";
@@ -175,14 +167,14 @@ void Administrator::del_user()
     std::cout << "学号(工号): ";
     int del_id;
     std::cin >> del_id;
-    if (Find(del_id).identity() == -1)  // 用户不存在
+    if (Find(users, del_id) < 0)  // 用户不存在
     {
         std::cout << "用户不存在!\n";
         getch();
         ClearScreen();
         return;
     }
-    switch (Find(del_id).identity())
+    switch (users[Find(users, del_id)]->identity())
     {
         case ADMINISTRATOR:
         {
@@ -221,7 +213,7 @@ void Administrator::update()
 {
     admins = Remove(admins, id_);
     admins.push_back(*this);
-    UpadateFiles();
+    UpdateFiles();
     return;
 }
 
@@ -235,7 +227,9 @@ std::ifstream &operator >>(std::ifstream &in, Administrator &admin)
 
 std::ofstream &operator <<(std::ofstream &of, const Administrator &admin)
 {
-    of << User(admin) << '\n';
+    of << admin.identity_ << '\n';
+    of << admin.id_ << '\n';
+    of << admin.password_ << '\n';
     return of;
 }
 
@@ -250,9 +244,11 @@ void Teacher::add_course()
     std::cin >> new_id;
     if (Find(courses, new_id) >= 0)     // id符合
     {
-        course_id_.push_back(courses[Find(courses, new_id)]);
+        course_id_.push_back(new_id);
         courses[Find(courses, new_id)].add_teacher(id_);
         update();
+		HighlightPrint("添加成功!\n");
+		getch();
         return;
     }
     else
@@ -260,20 +256,32 @@ void Teacher::add_course()
         std::cout << "正在创建一门新课程...\n";
         std::cout << "课程名称: ";
         if (!(std::cin >> new_name))
-            HighlightPrint("输入错误! \n"), return;
+		{
+            HighlightPrint("输入错误! \n");
+			return;
+		}
         std::cout << "学分: ";
         if (!(std::cin >> credit))
-            HighlightPrint("输入错误! \n"), return;
+		{
+			HighlightPrint("输入错误! \n");
+			return;
+		}
         std::cout << "选修课? [0/1] ";
         if (!(std::cin >> is_optional))
-            HighlightPrint("输入错误! \n"), return;
+		{
+			HighlightPrint("输入错误! \n");
+			return;
+		}
         std::cout << "是否记分? [0/1] ";
         if (!(std::cin >> is_scoring))
-            HighlightPrint("输入错误! \n"), return;
+		{
+			HighlightPrint("输入错误! \n");
+			return;
+		}
         Course new_course(new_id, new_name, credit, is_optional, is_scoring);
         new_course.add_teacher(id_);
         courses.push_back(new_course);
-        WriteCourses("./data/courses.txt", courses);
+        WriteCourses();
         course_id_.push_back(new_id);
         update();
         return;
@@ -345,11 +353,12 @@ std::ifstream &operator >>(std::ifstream &in, Teacher &t)
 
 std::ofstream &operator <<(std::ofstream &of, const Teacher &t)
 {
-    of << User(t);
+    of << t.identity_ << '\n';
+    of << t.id_ << '\n';
+    of << t.password_ << '\n';
     of << t.name_ << '\n';
     of << "*\n";
-    std::vector<std::string>::iterator it;
-    for(it = t.course_id_.begin(); it != t.course_id_.end(); it++)
+    for(std::vector<std::string>::const_iterator it = t.course_id_.begin(); it != t.course_id_.end(); it++)
     {
         of << *it << '\n';
     }
@@ -390,7 +399,7 @@ void Student::add_course()
     course_id_.push_back(add_id);
     update();
     courses[Find(courses, add_id)].add_student(id_);
-    WriteCourses("./data/courses.txt", courses);
+    WriteCourses();
     HighlightPrint("添加成功!\n");
     getch();
     return;
@@ -422,7 +431,7 @@ void Student::course_info()
         {
             Score score = score_[Find(score_, tmp.id())];
             std::cout << score.num() << ' ';
-            std::cout << "课程内排名: " << score.rank() << '/' << tmp.students().size() << std::endl;
+            std::cout << "课程内排名: " << score.rank() << '/' << tmp.student_id().size() << std::endl;
         }
         else
             std::cout << "不记分  \n";
@@ -501,18 +510,20 @@ std::ifstream &operator >>(std::ifstream &in, Student &stu)
 
 std::ofstream &operator <<(std::ofstream &of, const Student &stu)
 {
-    of << User(stu);
+    of << stu.identity_ << '\n';
+    of << stu.id_ << '\n';
+    of << stu.password_ << '\n';
     of << stu.name_ << '\n';
     of << stu.class_id_ << '\n';
     of << "*\n";
-    std::vector<std::string>::iterator it1;
+    std::vector<std::string>::const_iterator it1;
     for(it1 = stu.course_id_.begin(); it1 != stu.course_id_.end(); it1++)
     {
         of << *it1 << '\n';
     }
     of << "#\n";
     of << "*\n";
-    std::vector<Score>::iterator it2;
+    std::vector<Score>::const_iterator it2;
     for(it2 = stu.score_.begin(); it2 != stu.score_.end(); it2++)
     {
         of << *it2;
@@ -540,8 +551,8 @@ std::ifstream &operator >>(std::ifstream &in, TeachingAssistant &ta)
     in >> ta.identity_;
     in >> ta.id_;
     in >> ta.password_;
-    in >> ta.name_;
-    in >> ta.class_id_;
+    in >> ta.Teacher::name_;
+    in >> ta.Student::class_id_;
     char start_flag;
     while ((start_flag = getch()) == '\n')
         ;
@@ -588,9 +599,11 @@ std::ifstream &operator >>(std::ifstream &in, TeachingAssistant &ta)
 
 std::ofstream &operator <<(std::ofstream &of, const TeachingAssistant &ta)
 {
-    of << User(ta);
-    of << ta.name_ << '\n';
-    of << ta.class_id_ << '\n';
+    of << ta.identity_ << '\n';
+    of << ta.id_ << '\n';
+    of << ta.password_ << '\n';
+    of << ta.Teacher::name_ << '\n';
+    of << ta.Student::class_id_ << '\n';
     of << "*\n";
     std::vector<std::string>::iterator it1;
     for(it1 = ta.Teacher::course_id().begin(); it1 != ta.Teacher::course_id().end(); it1++)

@@ -8,7 +8,7 @@ bool HighlightPrint(std::string text)
     if (handle == 0)
         return false;
     BOOL ret = SetConsoleTextAttribute(handle, WORD(9));
-    cout << text;
+    std::cout << text;
     ret = SetConsoleTextAttribute(handle, WORD(7));
     return (ret == true);
 }
@@ -29,6 +29,6 @@ void MenuNode::show(int index)
             HighlightPrint(options_text[i] + '\n');
             continue;
         }
-        std::cout << options_txt[i] << std::endl;
+        std::cout << options_text[i] << std::endl;
     }
 }
