@@ -1,5 +1,5 @@
 // user.h
-// æŠ½è±¡ç±»Useræ´¾ç”Ÿå‡ºAdministrator,Teacher,Studentç±»,TeachingAssistantç±»å¤šé‡ç»§æ‰¿è‡ªTeacherç±»å’ŒStudentç±»
+// ³éÏóÀàUserÅÉÉú³öAdministrator,Teacher,StudentÀà,TeachingAssistantÀà¶àÖØ¼Ì³Ğ×ÔTeacherÀàºÍStudentÀà
 
 #ifndef USER_H
 #define USER_H 
@@ -7,114 +7,131 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include "score.h"
 
-enum UserType { ENUM_ADMINISTRATOR, ENUM_TEACHER, ENUM_STUDENT };
-// ç”¨æˆ·ç±»å‹åˆ†ä¸ºç®¡ç†å‘˜,è€å¸ˆ,å­¦ç”Ÿä¸‰ç§èº«ä»½.
+enum UserType { ADMINISTRATOR, TEACHER, STUDENT, TEACHING_ASSISTANT };
+// ÓÃ»§ÀàĞÍ·ÖÎª¹ÜÀíÔ±,ÀÏÊ¦,Ñ§Éú,Öú½ÌËÄÖÖÉí·İ.
+
+bool ValidPassword(std::string password);   // ÅĞ¶ÏÃÜÂëÊÇ·ñ·ûºÏ±ê×¼.(Êı×Ö,´óĞ¡Ğ´×ÖÄ¸µÄ6-15Î»×éºÏ)
 
 class User
 {
 public:
-    User(){}
-    User(UserType identity, std::string id, std::string password):
-        identity_(identity), id_num_(id), password_(password) {}
-    virtual ~User();
+    friend class Token;
+    User() {}
+    User(int identity, int id, std::string password): identity_(identity), id_(id), password_(password) {}
+    virtual ~User() {}
 
-    virtual void Print() = 0;
-    UserType get_identity() { return identity_; }
-    std::string get_id_num() { return id_num_; }
-    std::string get_password() { return password_; }
-    void set_password(std::string new_password);
-
+    virtual void print() = 0;
+    virtual void update() = 0;  // ¸üĞÂÈ«¾Övector
+    friend std::ofstream &operator <<(std::ofstream &of, const User &u);
+    bool operator ==(const int id){ return id_ == id; }
+    int id() { return id_; }
+    int identity() { return identity_; }
+    void set_password();
 
 protected:
-    UserType identity_;         // ç”¨æˆ·èº«ä»½
-    std::string id_num_;        // ç”¨æˆ·ID
-    std::string password_;      // ç™»å½•ç®¡ç†ç³»ç»Ÿæ‰€ç”¨å¯†ç 
+    int identity_;         // ÓÃ»§Éí·İ
+    int id_;                    // ÓÃ»§ID
+    std::string password_;      // µÇÂ¼¹ÜÀíÏµÍ³ËùÓÃÃÜÂë
 };
 
-///////////////////////////////////////////////////////////////////
 
-class Administrator: public User        // ç»§æ‰¿è‡ªuseræŠ½è±¡ç±»
+
+class Administrator: public User        // ¼Ì³Ğ×Ôuser³éÏóÀà
 {
 public:
-    Administrator(){}
-    Administrator(std::string id, std::string password): User(ENUM_ADMINISTRATOR, id, password)
-    {}
-    ~Administrator();
+    Administrator() {}
+    Administrator(int id, std::string password): User(ADMINISTRATOR, id, password){}
+    ~Administrator() {}
 
-    void Print() { std::cout << "ç®¡ç†å‘˜: " << id_num_ << std::endl; }
-    
-    
-private:
+    void add_user();    // Ôö¼ÓĞÂÓÃ»§
+    void del_user();    // É¾³ıÓÃ»§
+    void print() { std::cout << "¹ÜÀíÔ±: " << id_ << std::endl; }
+    void update();
 
+    friend std::ifstream &operator >>(std::ifstream &in, Administrator &admin);
+    friend std::ofstream &operator <<(std::ofstream &of, const Administrator &admin);
 };
 
-//////////////////////////////////////////////////////////////////
 
 class Teacher: virtual public User
 {
 public:
-    Teacher(){}
-    Teacher(std::string id, std::string password, std::string name, std::vector<std::string> course_id, bool is_head_teacher = 0, std::string class_id = 0): 
-            User(ENUM_TEACHER, id, password), name_(name), course_id_(course_id), is_head_teacher_(is_head_teacher), class_id_(class_id)
-    {}
-    ~Teacher();
+	Teacher():User(), name_(), course_id_(), is_head_teacher_(0), class_id_() { course_id_.reserve(100); }
+    Teacher(int id, std::string password, std::string name, std::vector<std::string> course_id, bool is_head_teacher = 0, std::string class_id = 0): 
+            User(TEACHER, id, password), name_(name), course_id_(course_id), is_head_teacher_(is_head_teacher), class_id_(class_id) {}
+    ~Teacher() {}
 
-    void Print() { std::cout << name_ << "è€å¸ˆ" << std::endl; }
-    std::string get_name() { return name_; }
-    std::vector<std::string> get_course_id() { return course_id_; }
-    bool IsHeadTeacher() { return is_head_teacher_; }
-    std::string get_class_id() { return class_id_; }
+    bool is_head_teacher() { return is_head_teacher_; }
+    std::string class_id() { return class_id_; }
+    std::string name() { return name_; }
+    std::vector<std::string> course_id() const { return course_id_; }
+    void add_course();
+    void display_class();
+    void print() { std::cout << name_ << "ÀÏÊ¦" << std::endl; }
+    void update();
+    friend std::ifstream &operator >>(std::ifstream &in, Teacher &t);
+    friend std::ofstream &operator <<(std::ofstream &of, const Teacher &t);
 
-private:
-    std::string name_;                               // è€å¸ˆå§“å
-    std::vector<std::string> course_id_;             // è¯¾ç¨‹ID
-    bool is_head_teacher_;                           // æ˜¯å¦ç­ä¸»ä»»
-    std::string class_id_;                           // è‹¥æ˜¯ç­ä¸»ä»»,ç­çº§ID
+protected:
+    std::string name_;                               // ÀÏÊ¦ĞÕÃû
+    std::vector<std::string> course_id_;             // ¿Î³ÌID
+    bool is_head_teacher_;                           // ÊÇ·ñ°àÖ÷ÈÎ
+    std::string class_id_;                           // ÈôÊÇ°àÖ÷ÈÎ,°à¼¶ID
 };
 
-/////////////////////////////////////////////////////////////////////////
 
-const int kStudentMaxCredit = 32;       // å•å­¦æœŸå­¦åˆ†ä¸Šé™
+const int kStudentMaxCredit = 32;       // µ¥Ñ§ÆÚÑ§·ÖÉÏÏŞ
 
 class Student: virtual public User
 {
 public:
-    Student(){}
-    Student(std::string id, std::string password, std::string name, std::string class_id, 
+	Student():User(), name_(), class_id_(), course_id_(), score_() { course_id_.reserve(100), score_.reserve(100); }
+    Student(int id, std::string password, std::string name, std::string class_id, 
             std::vector<std::string> course_id):
-            User(ENUM_STUDENT, id, password), name_(name), class_id_(class_id), course_id_(course_id) 
-    {}
-    ~Student();
+            User(STUDENT, id, password), name_(name), class_id_(class_id), course_id_(course_id) {}
+    ~Student() {}
 
-    void Print() { std::cout << name_ << "åŒå­¦" << '(' << id_num_ << ')' << std::endl; }
-    std::string get_name() { return name_; }
-    std::string get_class_id() { return class_id_; }
-    std::vector<std::string> get_course_id() { return course_id_; }
-    std::vector<Score> get_score() { return score_; }
+    double gpa();
+    int credit();
+    std::string class_id() { return class_id_; }
+    std::string name() { return name_; }
+    std::vector<Score> score() { return score_; }
+    std::vector<std::string> course_id() const { return course_id_; }
+    void add_course();
+    void add_score(Score score);
+    void course_info();
+    void display_gpa_info();
+    void print() { std::cout << name_ << "Í¬Ñ§ " << '(' << id_ << ')' << std::endl; }
+    void update();
+    friend std::ifstream &operator >>(std::ifstream &in, Student &stud);
+    friend std::ofstream &operator <<(std::ofstream &of, const Student &stu);
 
-private:
-    std::string name_;                              // å­¦ç”Ÿå§“å
-    std::string class_id_;                          // ç­å·
-    std::vector<std::string> course_id_;            // è¯¾ç¨‹ID
-    std::vector<Score> score_;                      // å„è¯¾ç¨‹åˆ†æ•°
+protected:
+    std::string name_;                              // Ñ§ÉúĞÕÃû
+    std::string class_id_;                          // °àºÅ
+    std::vector<std::string> course_id_;            // ¿Î³ÌID
+    std::vector<Score> score_;                      // ¸÷¿Î³Ì·ÖÊı
 };
 
-////////////////////////////////////////////////////////////////////////////////
+bool CompareStudent(Student stu1, Student stu2);
 
 class TeachingAssistant: public Teacher, public Student
 {
 public:
-    TeachingAssistant(){}
-    TeachingAssistant(std::string id, std::string password, std::string name, std::vector<std::string> teach_course_id, 
-                    std::vector<std::string> learn_course_id, std::string class_id):
-                    User(ENUM_TEACHER, id, password), Teacher(id, password, name, teach_course_id), Student(id, password, name, class_id, learn_course_id)
-    {}
-    ~TeachingAssistant();
+    TeachingAssistant():User(), Teacher(), Student() {}
+    TeachingAssistant(int id, std::string password, std::string name, std::vector<std::string> teach_course_id, 
+                      std::vector<std::string> learn_course_id, std::string class_id):
+                      User(TEACHING_ASSISTANT, id, password), Teacher(id, password, name, teach_course_id), 
+                      Student(id, password, name, class_id, learn_course_id) {}
+    ~TeachingAssistant() {}
 
-private:
-
+    void print() { std::cout << Teacher::name() << "Öú½Ì " << std::endl; }
+    void update();
+    friend std::ifstream &operator >>(std::ifstream &in, TeachingAssistant &ta);
+    friend std::ofstream &operator <<(std::ofstream &of, const TeachingAssistant &ta);
 };
 
 

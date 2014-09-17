@@ -4,9 +4,19 @@
 #ifndef FILE_H
 #define FILE_H 
 
-#include <string>
 
-void UpdatePassword(std::string id_num, std::string new_password);
+// user info
+void WriteAdmins();
+void WriteTeachers();
+void WriteStudents();
+void WriteTAs();
+void ReadAdmins();
+void ReadTeachers();
+void ReadStudents();
+void ReadTAs();
+void ReadUsers();
 
+void WriteCourses();
+void ReadCourses();
 
 #endif
