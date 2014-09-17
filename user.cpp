@@ -20,30 +20,34 @@ bool ValidPassword(std::string password)
 void User::set_password()
 {
     ClearScreen();
-    std::cout << "åŸå¯†ç : ";
+    std::cout << "Ô­ÃÜÂë: ";
     std::string origin = GetPass();
     if (origin != password_)
     {
-        HighlightPrint("å¯†ç é”™è¯¯! \n");
+        HighlightPrint("ÃÜÂë´íÎó! \n");
+		getch();
         return;
     }
-    std::cout << "æ–°å¯†ç : ";
+    std::cout << "ĞÂÃÜÂë: ";
     std::string new_pwd = GetPass();
     if (!ValidPassword(new_pwd))
     {
-        HighlightPrint("è¯·è®¾ç½®6~15ä½æ•°å­—å­—æ¯å¯†ç !\n");
+        HighlightPrint("ÇëÉèÖÃ6~15Î»Êı×Ö×ÖÄ¸ÃÜÂë!\n");
+		getch();
         return;
     }
-    std::cout << "é‡å¤æ–°å¯†ç : ";
+    std::cout << "ÖØ¸´ĞÂÃÜÂë: ";
     std::string confirm = GetPass();
     if (new_pwd != confirm)
     {
-        HighlightPrint("ä¸¤æ¬¡å¯†ç ä¸ä¸€è‡´!\n");
+        HighlightPrint("Á½´ÎÃÜÂë²»Ò»ÖÂ!\n");
+		getch();
         return;
     }
     password_ = new_pwd;
     update();
-    std::cout << "è®¾ç½®æˆåŠŸ!\n";
+    HighlightPrint("ÉèÖÃ³É¹¦!\n");
+	getch();
     return;
 }
 
@@ -51,13 +55,13 @@ void Administrator::add_user()
 {
     std::vector<std::string> identities;
     int k = 1;      // identity = k
-    identities.push_back("æ•™å¸ˆ");
-    identities.push_back("å­¦ç”Ÿ");
-    identities.push_back("åŠ©æ•™");
-    while (true)        // èº«ä»½èœå•é€‰æ‹©.
+    identities.push_back("½ÌÊ¦");
+    identities.push_back("Ñ§Éú");
+    identities.push_back("Öú½Ì");
+    while (true)        // Éí·İ²Ëµ¥Ñ¡Ôñ.
     {
         ClearScreen();
-        std::cout << "è¯·é€‰æ‹©æ–°ç”¨æˆ·çš„èº«ä»½:\n";
+        std::cout << "ÇëÑ¡ÔñĞÂÓÃ»§µÄÉí·İ:\n";
         for (int i = 0; i < 3; ++i)
         {
             if (i == k - 1)
@@ -68,7 +72,7 @@ void Administrator::add_user()
             std::cout << identities[i] + '\n';
         }
         int ch = getch();
-        if (ch == 13)   // å›è½¦é€‰å®š.
+        if (ch == 13)   // »Ø³µÑ¡¶¨.
         {
             ClearScreen();
             HighlightPrint(identities[k - 1] + '\n');
@@ -100,35 +104,38 @@ void Administrator::add_user()
         if (new_id <= (*it)->id())
             new_id = (*it)->id() + 1;
     }
-    std::cout << "å­¦å·(å·¥å·): " << new_id << std::endl;
-    std::cout << "è¯·è¾“å…¥å§“å: ";
+    std::cout << "Ñ§ºÅ(¹¤ºÅ): " << new_id << std::endl;
+    std::cout << "ÇëÊäÈëĞÕÃû: ";
     std::string new_name;
     std::cin >> new_name;
-    std::cout << "å¯†ç å•æ‰“å°å®Œæ¯•!\n";      // é»˜è®¤å¯†ç ä¸å­¦å·(å·¥å·)ç›¸åŒ
-    HighlightPrint("è¯·å°½å¿«ä¿®æ”¹å¯†ç !\n");
+    std::cout << "ÃÜÂëµ¥´òÓ¡Íê±Ï!\n";      // Ä¬ÈÏÃÜÂëÓëÑ§ºÅ(¹¤ºÅ)ÏàÍ¬
+    HighlightPrint("Çë¾¡¿ìĞŞ¸ÄÃÜÂë!\n");
     switch (k)
     {
         case TEACHER:
         {
-
             std::ofstream fp("./data/teachers.txt", std::ios::app|std::ios::out);
             fp << k << '\n';
             fp << new_id << '\n';
-            fp << new_id << '\n';   // å¯†ç 
+            fp << new_id << '\n';   // ÃÜÂë
             fp << new_name << '\n';
-            std::cout << "è‹¥æ–°ç”¨æˆ·ä¸ºç­ä¸»ä»», è¯·è¾“å…¥ç­å·: [å¦åˆ™è¯·ç›´æ¥å›è½¦]";
-            if (getch() != 13)      // ç­ä¸»ä»»
+			fp << "*\n";
+			fp << "#\n";
+            std::cout << "ÈôĞÂÓÃ»§Îª°àÖ÷ÈÎ, ÇëÊäÈë°àºÅ: [·ñÔòÇëÖ±½Ó»Ø³µ] ";
+            if (getch() != 13)      // °àÖ÷ÈÎ
             {
                 fp << 1 << '\n';
                 std::string class_id;
                 std::cin >> class_id;
-                fp << class_id << '\n\n';
+                fp << class_id << "\n\n";
+				fp.close();
                 break;
             }
-            else    // éç­ä¸»ä»»
+            else    // ·Ç°àÖ÷ÈÎ
             {
                 fp << 0 << '\n';
-                fp << 0 << '\n\n';
+                fp << 0 << "\n\n";
+				fp.close();
                 break;
             }
         }
@@ -137,12 +144,17 @@ void Administrator::add_user()
             std::ofstream fp("./data/students.txt", std::ios::app|std::ios::out);
             fp << k << '\n';
             fp << new_id << '\n';
-            fp << new_id << '\n';   // å¯†ç 
+            fp << new_id << '\n';   // ÃÜÂë
             fp << new_name << '\n';
-            std::cout << "ç­å·: ";
+            std::cout << "°àºÅ: ";
             std::string class_id;
             std::cin >> class_id;
-            fp << class_id << '\n\n';
+            fp << class_id << '\n';
+			fp << "*\n";
+			fp << "#\n";
+			fp << "*\n";
+			fp << "#\n";
+			fp.close();
             break;
         }
         case TEACHING_ASSISTANT:
@@ -150,26 +162,35 @@ void Administrator::add_user()
             std::ofstream fp("./data/tas.txt", std::ios::app|std::ios::out);
             fp << k << '\n';
             fp << new_id << '\n';
-            fp << new_id << '\n';   // å¯†ç 
+            fp << new_id << '\n';   // ÃÜÂë
             fp << new_name << '\n';
-            std::cout << "ç­å·: ";
+            std::cout << "°àºÅ: ";
             std::string class_id;
             std::cin >> class_id;
-            fp << class_id << '\n\n';
+            fp << class_id << '\n';
+			fp << "*\n";
+			fp << "#\n";
+			fp << "*\n";
+			fp << "#\n";
+			fp.close();
             break;
         }
+		default:
+			break;
     }
     UpdateUsers();
+	return;
 }
 
 void Administrator::del_user()
 {
-    std::cout << "å­¦å·(å·¥å·): ";
+	ClearScreen();
+    std::cout << "Ñ§ºÅ(¹¤ºÅ): ";
     int del_id;
     std::cin >> del_id;
-    if (Find(users, del_id) < 0)  // ç”¨æˆ·ä¸å­˜åœ¨
+    if (Find(users, del_id) < 0)  // ÓÃ»§²»´æÔÚ
     {
-        std::cout << "ç”¨æˆ·ä¸å­˜åœ¨!\n";
+        std::cout << "ÓÃ»§²»´æÔÚ!\n";
         getch();
         ClearScreen();
         return;
@@ -178,35 +199,33 @@ void Administrator::del_user()
     {
         case ADMINISTRATOR:
         {
-            ClearScreen();
-            HighlightPrint("æ— æƒé™è¿›è¡Œæ­¤æ“ä½œ! \n");
+            HighlightPrint("ÎŞÈ¨ÏŞ½øĞĞ´Ë²Ù×÷! \n");
             break;
         }
         case TEACHER:
         {
-            ClearScreen();
             teachers = Remove(teachers, del_id);
-            HighlightPrint("ç”¨æˆ·å·²è¢«åˆ é™¤!\n");
+            HighlightPrint("ÓÃ»§ÒÑ±»É¾³ı!\n");
             break;
         }
         case STUDENT:
         {
-            ClearScreen();
             students = Remove(students, del_id);
-            HighlightPrint("ç”¨æˆ·å·²è¢«åˆ é™¤!\n");
+            HighlightPrint("ÓÃ»§ÒÑ±»É¾³ı!\n");
             break;
         }
         case TEACHING_ASSISTANT:
         {
-            ClearScreen();
             tas = Remove(tas, del_id);
-            HighlightPrint("ç”¨æˆ·å·²è¢«åˆ é™¤!\n");
+            HighlightPrint("ÓÃ»§ÒÑ±»É¾³ı!\n");
             break;
         }
         default:
             break;
     }
     UpdateFiles();
+	UpdateUsers();
+	return;
 }
 
 void Administrator::update()
@@ -236,54 +255,61 @@ std::ofstream &operator <<(std::ofstream &of, const Administrator &admin)
 void Teacher::add_course()
 {
     ClearScreen();
-    HighlightPrint("å¼€è®¾ä¸€é—¨è¯¾ç¨‹!\n");
-    std::cout << "è¯¾ç¨‹ID: ";
+    HighlightPrint("¿ªÉèÒ»ÃÅ¿Î³Ì!\n");
+    std::cout << "¿Î³ÌID: ";
     std::string new_id, new_name;
     int credit;
     bool is_optional, is_scoring;
     std::cin >> new_id;
-    if (Find(courses, new_id) >= 0)     // idç¬¦åˆ
+	int index = Find(courses, new_id);
+    if (index >= 0)     // id·ûºÏ
     {
         course_id_.push_back(new_id);
-        courses[Find(courses, new_id)].add_teacher(id_);
+		Course tmp = courses[index];
+        tmp.add_teacher(id_);
+		tmp.update();
         update();
-		HighlightPrint("æ·»åŠ æˆåŠŸ!\n");
+		HighlightPrint("Ìí¼Ó³É¹¦!\n");
 		getch();
         return;
     }
     else
     {
-        std::cout << "æ­£åœ¨åˆ›å»ºä¸€é—¨æ–°è¯¾ç¨‹...\n";
-        std::cout << "è¯¾ç¨‹åç§°: ";
+        std::cout << "ÕıÔÚ´´½¨Ò»ÃÅĞÂ¿Î³Ì...\n";
+        std::cout << "¿Î³ÌÃû³Æ: ";
         if (!(std::cin >> new_name))
 		{
-            HighlightPrint("è¾“å…¥é”™è¯¯! \n");
+            HighlightPrint("ÊäÈë´íÎó! \n");
+			getch();
 			return;
 		}
-        std::cout << "å­¦åˆ†: ";
+        std::cout << "Ñ§·Ö: ";
         if (!(std::cin >> credit))
 		{
-			HighlightPrint("è¾“å…¥é”™è¯¯! \n");
+			HighlightPrint("ÊäÈë´íÎó! \n");
+			getch();
 			return;
 		}
-        std::cout << "é€‰ä¿®è¯¾? [0/1] ";
+        std::cout << "Ñ¡ĞŞ¿Î? [0/1] ";
         if (!(std::cin >> is_optional))
 		{
-			HighlightPrint("è¾“å…¥é”™è¯¯! \n");
+			HighlightPrint("ÊäÈë´íÎó! \n");
+			getch();
 			return;
 		}
-        std::cout << "æ˜¯å¦è®°åˆ†? [0/1] ";
+        std::cout << "ÊÇ·ñ¼Ç·Ö? [0/1] ";
         if (!(std::cin >> is_scoring))
 		{
-			HighlightPrint("è¾“å…¥é”™è¯¯! \n");
+			HighlightPrint("ÊäÈë´íÎó! \n");
+			getch();
 			return;
 		}
         Course new_course(new_id, new_name, credit, is_optional, is_scoring);
         new_course.add_teacher(id_);
-        courses.push_back(new_course);
-        WriteCourses();
         course_id_.push_back(new_id);
         update();
+		HighlightPrint("Ìí¼Ó³É¹¦!\n");
+		getch();
         return;
     }
 }
@@ -304,7 +330,7 @@ void Teacher::display_class()
     std::sort(my_class.begin(), my_class.end(), CompareStudent);
     ClearScreen();
     HighlightPrint(class_id_ + '\n');
-    std::cout << "[æŒ‰GPAæ’åº]\n";
+    std::cout << "[°´GPAÅÅĞò]\n";
     for (std::vector<Student>::iterator it = my_class.begin(); it != my_class.end(); it++)
         it->display_gpa_info();
     getch();
@@ -333,15 +359,17 @@ std::ifstream &operator >>(std::ifstream &in, Teacher &t)
         while (true)
         {
             char end_flag;
-            std::string tmp_id;
-            in >> tmp_id;
-            t.course_id_.push_back(tmp_id);
             while ((end_flag = in.get()) == '\n')
                 ;
             if (end_flag == '#')
                 break;
             else
+			{
                 in.seekg(-1, std::ios::cur);           
+				std::string tmp_id;
+				in >> tmp_id;
+				t.course_id_.push_back(tmp_id);
+			}
         }
     }
     else
@@ -364,7 +392,7 @@ std::ofstream &operator <<(std::ofstream &of, const Teacher &t)
     }
     of << "#\n";
     of << t.is_head_teacher_ << '\n';
-    of << t.class_id_ << '\n\n';
+    of << t.class_id_ << "\n\n";
     return of;
 }
 
@@ -373,7 +401,7 @@ double Student::gpa()
     int total = 0;
     for (std::vector<Score>::iterator it = score_.begin(); it != score_.end(); it++)
         total += it->num() * courses[Find(courses, it->course_id())].credit();
-    return double(total) / double(credit());
+    return (credit() ? (double(total) / double(credit())) : 0.0);
 }
 
 int Student::credit()
@@ -387,20 +415,27 @@ int Student::credit()
 void Student::add_course()
 {
     ClearScreen();
-    HighlightPrint("è¯¾ç¨‹ID: ");
+    HighlightPrint("¿Î³ÌID: ");
     std::string add_id;
     std::cin >> add_id;
     if (Find(courses, add_id) < 0)
     {
-        HighlightPrint("æ²¡æœ‰è¯¥è¯¾ç¨‹! è¯·æ ¸å¯¹è¯¾ç¨‹ID.\n");
+        HighlightPrint("Ã»ÓĞ¸Ã¿Î³Ì! ÇëºË¶Ô¿Î³ÌID.\n");
         getch();
         return;
     }
+	if (Find(course_id_, add_id) >= 0)
+	{
+		HighlightPrint("ÒÑ¾­Ìí¼Ó¹ı¸Ã¿Î³Ì!\n");
+		getch();
+		return;
+	}
     course_id_.push_back(add_id);
     update();
-    courses[Find(courses, add_id)].add_student(id_);
+	Course tmp = courses[Find(courses, add_id)];
+	tmp.add_student(id_);
     WriteCourses();
-    HighlightPrint("æ·»åŠ æˆåŠŸ!\n");
+    HighlightPrint("Ìí¼Ó³É¹¦!\n");
     getch();
     return;
 }
@@ -420,23 +455,26 @@ void Student::course_info()
     for (std::vector<std::string>::iterator it = course_id_.begin(); it != course_id_.end(); it++)
     {
         Course tmp = courses[Find(courses, *it)];
-        std::cout << tmp.id() << "  ";
-        std::cout << tmp.name() << "  ";
-        std::cout << tmp.credit() << "å­¦åˆ†  ";
-        if (tmp.is_optional())
-            std::cout << "é€‰ä¿®è¯¾ç¨‹ ";
-        else
-            std::cout << "å¿…é™è¯¾ç¨‹ ";
+		printf("%6s", tmp.id().c_str());
+		printf("%24s", tmp.name().c_str());
+		printf("%3d%s", tmp.credit(), "Ñ§·Ö");
+		printf("%10s", tmp.is_optional()?"Ñ¡ĞŞ¿Î³Ì":"±ØÏŞ¿Î³Ì");
         if (tmp.is_scoring())
         {
+			if (Find(score_, tmp.id()) < 0)
+			{
+				printf("%12s\n","³É¼¨Î´Â¼Èë");
+				continue;
+			}
             Score score = score_[Find(score_, tmp.id())];
-            std::cout << score.num() << ' ';
-            std::cout << "è¯¾ç¨‹å†…æ’å: " << score.rank() << '/' << tmp.student_id().size() << std::endl;
+			printf("%4d", score.num());
+            std::cout << "  ¿Î³ÌÄÚÅÅÃû: " << score.rank() << '/' << tmp.student_id().size() << std::endl;
         }
         else
-            std::cout << "ä¸è®°åˆ†  \n";
+            printf("%12s\n","²»¼Ç·Ö");
     }
-    std::cout << "æ€»GPA: " << gpa() << std::endl;
+    std::cout << "×ÜGPA: " << gpa() << std::endl;
+	getch();
     return;
 }
 
@@ -465,42 +503,46 @@ std::ifstream &operator >>(std::ifstream &in, Student &stu)
     in >> stu.name_;
     in >> stu.class_id_;
     char start_flag;
-    while ((start_flag = getch()) == '\n')
+    while ((start_flag = in.get()) == '\n')
         ;
     if (start_flag == '*')
     {
         while (true)
         {
             char end_flag;
-            std::string tmp_id;
-            in >> tmp_id;
-            stu.course_id_.push_back(tmp_id);
             while ((end_flag = in.get()) == '\n')
                 ;
             if (end_flag == '#')
                 break;
             else
+			{
                 in.seekg(-1, std::ios::cur);
+				std::string tmp_id;
+				in >> tmp_id;
+				stu.course_id_.push_back(tmp_id);
+			}
         }
     }
     else
         in.seekg(-1, std::ios::cur);
-    while ((start_flag = getch()) == '\n')
+    while ((start_flag = in.get()) == '\n')
         ;
     if (start_flag == '*')
     {
         while (true)
         {
             char end_flag;
-            Score tmp_score;
-            in >> tmp_score;
-            stu.score_.push_back(tmp_score);
             while ((end_flag = in.get()) == '\n')
                 ;
             if (end_flag == '#')
                 break;
             else
+			{
                 in.seekg(-1, std::ios::cur);
+				Score tmp_score;
+				in >> tmp_score;
+				stu.score_.push_back(tmp_score);
+			}
         }
     }
     else
@@ -554,42 +596,46 @@ std::ifstream &operator >>(std::ifstream &in, TeachingAssistant &ta)
     in >> ta.Teacher::name_;
     in >> ta.Student::class_id_;
     char start_flag;
-    while ((start_flag = getch()) == '\n')
+    while ((start_flag = in.get()) == '\n')
         ;
     if (start_flag == '*')
     {
         while (true)
         {
             char end_flag;
-            std::string tmp_id;
-            in >> tmp_id;
-            ta.Teacher::course_id_.push_back(tmp_id);
             while ((end_flag = in.get()) == '\n')
                 ;
             if (end_flag == '#')
                 break;
             else
+			{
                 in.seekg(-1, std::ios::cur);
+				std::string tmp_id;
+				in >> tmp_id;
+				ta.Teacher::course_id_.push_back(tmp_id);
+			}
         }
     }
     else
         in.seekg(-1, std::ios::cur);
-    while ((start_flag = getch()) == '\n')
+    while ((start_flag = in.get()) == '\n')
         ;
     if (start_flag == '*')
     {
         while (true)
         {
             char end_flag;
-            std::string tmp_id;
-            in >> tmp_id;
-            ta.Student::course_id_.push_back(tmp_id);
             while ((end_flag = in.get()) == '\n')
                 ;
             if (end_flag == '#')
                 break;
             else
+			{
                 in.seekg(-1, std::ios::cur);
+				std::string tmp_id;
+				in >> tmp_id;
+				ta.Student::course_id_.push_back(tmp_id);
+			}
         }
     }
     else
@@ -605,15 +651,15 @@ std::ofstream &operator <<(std::ofstream &of, const TeachingAssistant &ta)
     of << ta.Teacher::name_ << '\n';
     of << ta.Student::class_id_ << '\n';
     of << "*\n";
-    std::vector<std::string>::iterator it1;
-    for(it1 = ta.Teacher::course_id().begin(); it1 != ta.Teacher::course_id().end(); it1++)
+    std::vector<std::string>::const_iterator it1;
+    for(it1 = (ta.Teacher::course_id_).begin(); it1 != (ta.Teacher::course_id_).end(); it1++)
     {
         of << *it1 << '\n';
     }
     of << "#\n";
     of << "*\n";
-    std::vector<std::string>::iterator it2;
-    for(it2 = ta.Student::course_id().begin(); it2 != ta.Student::course_id().end(); it2++)
+    std::vector<std::string>::const_iterator it2;
+    for(it2 = (ta.Student::course_id_).begin(); it2 != (ta.Student::course_id_).end(); it2++)
     {
         of << *it2 << '\n';
     }

@@ -9,7 +9,6 @@ void Course::add_teacher(int teacher_id)
 {
     teacher_id_.push_back(teacher_id);
     update();
-    WriteCourses();
     return;
 }
 
@@ -17,7 +16,6 @@ void Course::add_student(int student_id)
 {
     student_id_.push_back(student_id);
     update();
-    WriteCourses();
     return;
 }
 
@@ -43,7 +41,12 @@ void Course::display()
         std::cout << "必限课程 \n";
     HighlightPrint("讲师: \n");
     for (std::vector<int>::iterator it = teacher_id_.begin(); it != teacher_id_.end(); it++)
-        teachers[Find(teachers, *it)].print();
+	{
+		if (Find(teachers, *it) < 0)
+			tas[Find(tas, *it)].print();
+		else
+			teachers[Find(teachers, *it)].print();
+	}
     HighlightPrint("学生: \n");
     for (std::vector<int>::iterator it = student_id_.begin(); it != student_id_.end(); it++)
     {   
@@ -57,6 +60,7 @@ void Course::display()
             std::cout << stu.score()[Find(stu.score(), id_)].num() << std::endl;
         }
     }
+	getch();
     return;
 }
 
@@ -71,7 +75,7 @@ void Course::update_score()
         std::cout << stu.name() << ' ';
         std::cout << "成绩: ";
         int num = 0;
-        if (!std::cin >> num)
+        if (!(std::cin >> num))
         {
             HighlightPrint("输入错误!\n");
             return;
@@ -92,42 +96,46 @@ std::ifstream &operator >>(std::ifstream &in, Course &c)
 	in >> c.is_optional_;
 	in >> c.is_scoring_;
     char start_flag;
-    while ((start_flag = getch()) == '\n')
+    while ((start_flag = in.get()) == '\n')
         ;
     if (start_flag == '*')
     {
         while (true)
         {
             char end_flag;
-            int tmp_id;
-            in >> tmp_id;
-            c.teacher_id_.push_back(tmp_id);
             while ((end_flag = in.get()) == '\n')
                 ;
             if (end_flag == '#')
                 break;
             else
+			{
                 in.seekg(-1, std::ios::cur);
+				int tmp_id;
+				in >> tmp_id;
+				c.teacher_id_.push_back(tmp_id);
+			}
         }
     }
     else
         in.seekg(-1, std::ios::cur);
-    while ((start_flag = getch()) == '\n')
+    while ((start_flag = in.get()) == '\n')
         ;
     if (start_flag == '*')
     {
         while (true)
         {
             char end_flag;
-            int tmp_id;
-            in >> tmp_id;
-            c.student_id_.push_back(tmp_id);
             while ((end_flag = in.get()) == '\n')
                 ;
             if (end_flag == '#')
                 break;
             else
+			{
                 in.seekg(-1, std::ios::cur);
+				int tmp_id;
+				in >> tmp_id;
+				c.student_id_.push_back(tmp_id);
+			}
         }
     }
     else
@@ -146,8 +154,9 @@ std::ofstream &operator <<(std::ofstream &of, const Course &c)
     for (std::vector<int>::const_iterator it = c.teacher_id_.begin(); it != c.teacher_id_.end(); it++)
         of << *it << '\n';
     of << "#\n";
+    of << "*\n";
     for (std::vector<int>::const_iterator it = c.student_id_.begin(); it != c.student_id_.end(); it++)
         of << *it << '\n';
-    of << "#\n\n";
+	of << "#\n\n";
     return of;
 }

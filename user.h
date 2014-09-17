@@ -1,5 +1,5 @@
 // user.h
-// æŠ½è±¡ç±»Useræ´¾ç”Ÿå‡ºAdministrator,Teacher,Studentç±»,TeachingAssistantç±»å¤šé‡ç»§æ‰¿è‡ªTeacherç±»å’ŒStudentç±»
+// ³éÏóÀàUserÅÉÉú³öAdministrator,Teacher,StudentÀà,TeachingAssistantÀà¶àÖØ¼Ì³Ğ×ÔTeacherÀàºÍStudentÀà
 
 #ifndef USER_H
 #define USER_H 
@@ -11,9 +11,9 @@
 #include "score.h"
 
 enum UserType { ADMINISTRATOR, TEACHER, STUDENT, TEACHING_ASSISTANT };
-// ç”¨æˆ·ç±»å‹åˆ†ä¸ºç®¡ç†å‘˜,è€å¸ˆ,å­¦ç”Ÿ,åŠ©æ•™å››ç§èº«ä»½.
+// ÓÃ»§ÀàĞÍ·ÖÎª¹ÜÀíÔ±,ÀÏÊ¦,Ñ§Éú,Öú½ÌËÄÖÖÉí·İ.
 
-bool ValidPassword(std::string password);   // åˆ¤æ–­å¯†ç æ˜¯å¦ç¬¦åˆæ ‡å‡†.(æ•°å­—,å¤§å°å†™å­—æ¯çš„6-15ä½ç»„åˆ)
+bool ValidPassword(std::string password);   // ÅĞ¶ÏÃÜÂëÊÇ·ñ·ûºÏ±ê×¼.(Êı×Ö,´óĞ¡Ğ´×ÖÄ¸µÄ6-15Î»×éºÏ)
 
 class User
 {
@@ -24,31 +24,31 @@ public:
     virtual ~User() {}
 
     virtual void print() = 0;
-    virtual void update() = 0;  // æ›´æ–°å…¨å±€vector
+    virtual void update() = 0;  // ¸üĞÂÈ«¾Övector
     friend std::ofstream &operator <<(std::ofstream &of, const User &u);
-    bool operator ==(const int &id){ return id_ == id; }
+    bool operator ==(const int id){ return id_ == id; }
     int id() { return id_; }
     int identity() { return identity_; }
     void set_password();
 
 protected:
-    int identity_;         // ç”¨æˆ·èº«ä»½
-    int id_;                    // ç”¨æˆ·ID
-    std::string password_;      // ç™»å½•ç®¡ç†ç³»ç»Ÿæ‰€ç”¨å¯†ç 
+    int identity_;         // ÓÃ»§Éí·İ
+    int id_;                    // ÓÃ»§ID
+    std::string password_;      // µÇÂ¼¹ÜÀíÏµÍ³ËùÓÃÃÜÂë
 };
 
 
 
-class Administrator: public User        // ç»§æ‰¿è‡ªuseræŠ½è±¡ç±»
+class Administrator: public User        // ¼Ì³Ğ×Ôuser³éÏóÀà
 {
 public:
     Administrator() {}
     Administrator(int id, std::string password): User(ADMINISTRATOR, id, password){}
     ~Administrator() {}
 
-    void add_user();    // å¢åŠ æ–°ç”¨æˆ·
-    void del_user();    // åˆ é™¤ç”¨æˆ·
-    void print() { std::cout << "ç®¡ç†å‘˜: " << id_ << std::endl; }
+    void add_user();    // Ôö¼ÓĞÂÓÃ»§
+    void del_user();    // É¾³ıÓÃ»§
+    void print() { std::cout << "¹ÜÀíÔ±: " << id_ << std::endl; }
     void update();
 
     friend std::ifstream &operator >>(std::ifstream &in, Administrator &admin);
@@ -59,7 +59,7 @@ public:
 class Teacher: virtual public User
 {
 public:
-    Teacher() {}
+	Teacher():User(), name_(), course_id_(), is_head_teacher_(0), class_id_() { course_id_.reserve(100); }
     Teacher(int id, std::string password, std::string name, std::vector<std::string> course_id, bool is_head_teacher = 0, std::string class_id = 0): 
             User(TEACHER, id, password), name_(name), course_id_(course_id), is_head_teacher_(is_head_teacher), class_id_(class_id) {}
     ~Teacher() {}
@@ -70,25 +70,25 @@ public:
     std::vector<std::string> course_id() const { return course_id_; }
     void add_course();
     void display_class();
-    void print() { std::cout << name_ << "è€å¸ˆ" << std::endl; }
+    void print() { std::cout << name_ << "ÀÏÊ¦" << std::endl; }
     void update();
     friend std::ifstream &operator >>(std::ifstream &in, Teacher &t);
     friend std::ofstream &operator <<(std::ofstream &of, const Teacher &t);
 
 protected:
-    std::string name_;                               // è€å¸ˆå§“å
-    std::vector<std::string> course_id_;             // è¯¾ç¨‹ID
-    bool is_head_teacher_;                           // æ˜¯å¦ç­ä¸»ä»»
-    std::string class_id_;                           // è‹¥æ˜¯ç­ä¸»ä»»,ç­çº§ID
+    std::string name_;                               // ÀÏÊ¦ĞÕÃû
+    std::vector<std::string> course_id_;             // ¿Î³ÌID
+    bool is_head_teacher_;                           // ÊÇ·ñ°àÖ÷ÈÎ
+    std::string class_id_;                           // ÈôÊÇ°àÖ÷ÈÎ,°à¼¶ID
 };
 
 
-const int kStudentMaxCredit = 32;       // å•å­¦æœŸå­¦åˆ†ä¸Šé™
+const int kStudentMaxCredit = 32;       // µ¥Ñ§ÆÚÑ§·ÖÉÏÏŞ
 
 class Student: virtual public User
 {
 public:
-    Student() {}
+	Student():User(), name_(), class_id_(), course_id_(), score_() { course_id_.reserve(100), score_.reserve(100); }
     Student(int id, std::string password, std::string name, std::string class_id, 
             std::vector<std::string> course_id):
             User(STUDENT, id, password), name_(name), class_id_(class_id), course_id_(course_id) {}
@@ -104,16 +104,16 @@ public:
     void add_score(Score score);
     void course_info();
     void display_gpa_info();
-    void print() { std::cout << name_ << "åŒå­¦ " << '(' << id_ << ')' << std::endl; }
+    void print() { std::cout << name_ << "Í¬Ñ§ " << '(' << id_ << ')' << std::endl; }
     void update();
     friend std::ifstream &operator >>(std::ifstream &in, Student &stud);
     friend std::ofstream &operator <<(std::ofstream &of, const Student &stu);
 
 protected:
-    std::string name_;                              // å­¦ç”Ÿå§“å
-    std::string class_id_;                          // ç­å·
-    std::vector<std::string> course_id_;            // è¯¾ç¨‹ID
-    std::vector<Score> score_;                      // å„è¯¾ç¨‹åˆ†æ•°
+    std::string name_;                              // Ñ§ÉúĞÕÃû
+    std::string class_id_;                          // °àºÅ
+    std::vector<std::string> course_id_;            // ¿Î³ÌID
+    std::vector<Score> score_;                      // ¸÷¿Î³Ì·ÖÊı
 };
 
 bool CompareStudent(Student stu1, Student stu2);
@@ -121,14 +121,14 @@ bool CompareStudent(Student stu1, Student stu2);
 class TeachingAssistant: public Teacher, public Student
 {
 public:
-    TeachingAssistant() {}
+    TeachingAssistant():User(), Teacher(), Student() {}
     TeachingAssistant(int id, std::string password, std::string name, std::vector<std::string> teach_course_id, 
                       std::vector<std::string> learn_course_id, std::string class_id):
                       User(TEACHING_ASSISTANT, id, password), Teacher(id, password, name, teach_course_id), 
                       Student(id, password, name, class_id, learn_course_id) {}
     ~TeachingAssistant() {}
 
-    void print() { std::cout << Teacher::name() << "åŠ©æ•™ " << std::endl; }
+    void print() { std::cout << Teacher::name() << "Öú½Ì " << std::endl; }
     void update();
     friend std::ifstream &operator >>(std::ifstream &in, TeachingAssistant &ta);
     friend std::ofstream &operator <<(std::ofstream &of, const TeachingAssistant &ta);

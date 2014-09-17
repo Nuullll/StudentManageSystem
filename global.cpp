@@ -1,6 +1,7 @@
 // global.cpp
 
 #include "global.h"
+#include "course.h"
 #include "file.h"
 
 std::vector<User*> users;   // 所有用户基类指针.
@@ -10,12 +11,52 @@ std::vector<Student> students;
 std::vector<TeachingAssistant> tas; // ta: teachingassistant
 std::vector<Course> courses;
 
+int GetX()
+{
+	HANDLE hStdout;
+	CONSOLE_SCREEN_BUFFER_INFO pBuffer;
+	hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+	GetConsoleScreenBufferInfo(hStdout, &pBuffer);
+	return pBuffer.dwCursorPosition.X;
+}
+
+int GetY()
+{
+	HANDLE hStdout;
+	CONSOLE_SCREEN_BUFFER_INFO pBuffer;
+	hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+	GetConsoleScreenBufferInfo(hStdout, &pBuffer);
+	return pBuffer.dwCursorPosition.Y;
+}
+
+void GotoXY(int x, int y)
+{
+	CONSOLE_SCREEN_BUFFER_INFO    csbiInfo;                            
+    HANDLE    hConsoleOut;
+    hConsoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleScreenBufferInfo(hConsoleOut,&csbiInfo);
+    csbiInfo.dwCursorPosition.X = x;                                    
+    csbiInfo.dwCursorPosition.Y = y;                                    
+    SetConsoleCursorPosition(hConsoleOut,csbiInfo.dwCursorPosition); 
+}
+
 std::string GetPass()
 {
     std::string pwd;
     char tmp;
     while ((tmp = getch()) != 13)
     {
+		if (tmp == 8)	// backspace
+		{
+			if (pwd.size() == 0)
+				continue;
+			pwd.erase(pwd.end() - 1);	// 删除末位
+			int x = GetX(), y = GetY();	// 清掉屏幕上的一个'*'
+			GotoXY(x - 1, y);
+			std::cout << ' ';
+			GotoXY(x - 1, y);
+			continue;
+		}
         pwd.append(1, tmp);
         std::cout << '*';
     }
@@ -64,7 +105,8 @@ void UpdateFiles()
     WriteAdmins();
     WriteTeachers();
     WriteStudents();
-    WriteTAs();    
+    WriteTAs();
+	WriteCourses();
 }
 
 void UpdateUsers()
@@ -75,7 +117,10 @@ void UpdateUsers()
     ReadStudents();
     ReadTAs();
 	ReadUsers();
-
+	ReadCourses();
+	HighlightPrint("加载完毕! \n");
+	getch();
+	return;
 }
 
 int Find(std::vector<User*> v, int id)

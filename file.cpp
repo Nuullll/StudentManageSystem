@@ -39,7 +39,11 @@ void ReadAdmins()
     admins.clear();
     Administrator admin;
     while (in >> admin)
+	{
         admins.push_back(admin);
+		admin = Administrator();
+	}
+	return;
 }
 
 void ReadTeachers()
@@ -48,7 +52,11 @@ void ReadTeachers()
     teachers.clear();
     Teacher teacher;
     while (in >> teacher)
+	{
         teachers.push_back(teacher);
+		teacher = Teacher();
+	}
+	return;
 }
 
 void ReadStudents()
@@ -57,7 +65,11 @@ void ReadStudents()
     students.clear();
     Student student;
     while (in >> student)
+	{
         students.push_back(student);
+		student = Student();
+	}
+	return;
 }
 
 void ReadTAs()
@@ -66,33 +78,38 @@ void ReadTAs()
     tas.clear();
     TeachingAssistant ta;
     while (in >> ta)
+	{
         tas.push_back(ta);
+		ta = TeachingAssistant();
+	}
+	return;
 }
 
 void ReadUsers()
 {
-    users.clear();
-    User* up;
+	users.clear();
+	User* up;
     for (std::vector<Administrator>::iterator it = admins.begin(); it != admins.end(); it++)
     {
-        up = &*it;
+        up = &(*it);
         users.push_back(up);
     }
     for (std::vector<Teacher>::iterator it = teachers.begin(); it != teachers.end(); it++)
     {
-        up = &*it;
+        up = &(*it);
         users.push_back(up);
     }
     for (std::vector<Student>::iterator it = students.begin(); it != students.end(); it++)
     {
-        up = &*it;
+        up = &(*it);
         users.push_back(up);
     }
     for (std::vector<TeachingAssistant>::iterator it = tas.begin(); it != tas.end(); it++)
     {
-        up = &*it;
+        up = &(*it);
         users.push_back(up);
     }
+	return;
 }
 
 void WriteCourses()
@@ -108,5 +125,8 @@ void ReadCourses()
 	courses.clear();
 	Course tmp;
 	while (in >> tmp)
+	{
 		courses.push_back(tmp);
+		tmp = Course();
+	}
 }

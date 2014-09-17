@@ -1,4 +1,6 @@
 // menu.h
+#ifndef MENU_H
+#define MENU_H
 
 #include <iostream>
 #include <conio.h>
@@ -17,3 +19,4 @@ struct MenuNode
     void show(int index);
 };
 
+#endif

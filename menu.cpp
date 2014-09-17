@@ -1,6 +1,7 @@
 // menu.cpp
 
 #include "menu.h"
+#include "global.h"
 
 bool HighlightPrint(std::string text)
 {
@@ -21,7 +22,7 @@ void MenuNode::append(std::string text, MenuNode* target)
 
 void MenuNode::show(int index)
 {
-    system("cls");
+    ClearScreen();
     for (int i = 0; i < options_text.size(); i++)
     {
         if (i == index)

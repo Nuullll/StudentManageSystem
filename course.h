@@ -10,7 +10,7 @@ const int kCourseMaxTeacher = 5;        // 课程老师最大值(包括主讲老
 class Course
 {
 public:
-    Course() {}
+    Course():id_(), name_(), credit_(), is_optional_(), is_scoring_() {}
     Course(std::string id, std::string name, int credit, bool is_optional, bool is_scoring):
            id_(id), name_(name), credit_(credit), is_optional_(is_optional), is_scoring_(is_scoring) {}
     ~Course() {}
@@ -28,7 +28,7 @@ public:
     void display();
     void update_score();
 
-    friend bool operator ==(Course &c, std::string id){ return (c.id_ == id) || (c.name_ == id); }
+    bool operator ==(std::string &id){ return ((id_ == id) || (name_ == id)); }
     friend std::ifstream &operator >>(std::ifstream &in, Course &c);
     friend std::ofstream &operator <<(std::ofstream &of, const Course &c);
 

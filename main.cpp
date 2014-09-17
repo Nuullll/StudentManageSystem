@@ -13,6 +13,8 @@
 int main(int argc, char const *argv[])
 {
 login:              // 登录标签.
+	ClearScreen();
+	HighlightPrint("载入数据中...请稍后...\n");
 	UpdateUsers();
     ClearScreen();      // 保留软件标题的清屏函数.
     Token tmp;      // 获取登录信息的令牌.
@@ -25,6 +27,7 @@ login:              // 登录标签.
             std::cout << "登录成功!\n";
             std::cout << "欢迎";
             user->print();  // 显示用户基本信息.
+			getch();
             break;
         }
         else
@@ -34,9 +37,10 @@ login:              // 登录标签.
             std::cout << "[回车继续, q退出系统] ";
             if (getch() == 'q')     // 退出系统.
             {
-                std::cout << "再见! \n";
+                HighlightPrint("\n再见! \n");
                 return 0;
             }
+			ClearScreen();
         }
     }       // 登录成功.
     // 根据用户身份初始化菜单.
@@ -124,8 +128,6 @@ admin_right:
                                 }
                                 case 4:
                                     goto login;
-                                default:
-                                    break;
                             }
                             k = 0;
                             break;
@@ -137,8 +139,6 @@ admin_right:
                             break;
                         }
                     }
-                    default:
-                        break;
                 }
             }
         }
@@ -203,6 +203,8 @@ teacher_right:
                             mp["增开课程"] = 2;
                             mp["修改密码"] = 3;
                             mp["退出登录"] = 4;
+							for (int i = 0; i < teacher.course_id().size(); i++)
+								mp[courses[Find(courses, teacher.course_id()[i])].name()] = 5;
                             switch (mp[now.options_text[k]])
                             {
                                 case 0:
@@ -227,11 +229,12 @@ teacher_right:
                                 }
                                 case 4:
                                     goto login;
-                                default:
+                                case 5:
                                 {
                                     Course course = courses[Find(courses, now.options_text[k])];
                                     if (course.is_scoring())
                                     {
+										ClearScreen();
                                         std::cout << "现在录入成绩? [y/n]";
                                         ch = getch();
                                         if (ch == 'y' || ch == 'Y')
@@ -254,8 +257,6 @@ teacher_right:
                             break;
                         }
                     }
-                    default:
-                        break;
                 }
             }
         }
@@ -340,8 +341,6 @@ student_left:
                                 }
                                 case 4:
                                     goto login;
-                                default:
-                                    break;
                             }
                             k = 0;
                             break;
@@ -353,8 +352,6 @@ student_left:
                             break;
                         }
                     }
-                    default:
-                        break;
                 }
             }
         }
@@ -421,6 +418,8 @@ ta_right:
                             mp["增加课程"] = 3;
                             mp["修改密码"] = 4;
                             mp["退出登录"] = 5;
+							for (int i = 0; i < ta.Teacher::course_id().size(); i++)
+								mp[courses[Find(courses, ta.Teacher::course_id()[i])].name()] = 6;
                             switch (mp[now.options_text[k]])
                             {
                                 case 0:
@@ -450,11 +449,12 @@ ta_right:
                                 }
                                 case 5:
                                     goto login;
-                                default:
+                                case 6:
                                 {
                                     Course course = courses[Find(courses, now.options_text[k])];
                                     if (course.is_scoring())
                                     {
+										ClearScreen();
                                         std::cout << "现在录入成绩? [y/n]";
                                         ch = getch();
                                         if (ch == 'y' || ch == 'Y')
@@ -467,6 +467,14 @@ ta_right:
                                     break;
                                 }
                             }
+							k = 0;
+							break;
+                        }
+                        else
+                        {
+                            now = *now.options_target[k];
+                            k = 0;
+                            break;
                         }
                     }
                 }

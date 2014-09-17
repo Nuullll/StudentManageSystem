@@ -13,7 +13,8 @@ int Score::rank()
 {
     Course course = courses[Find(courses, course_id_)];
     std::vector<Score> scores;
-    for (std::vector<int>::iterator it = course.student_id().begin(); it != course.student_id().end(); it++)
+	std::vector<int> student_id = course.student_id();
+    for (std::vector<int>::const_iterator it = student_id.begin(); it != student_id.end(); it++)
     {
         Student stu = students[Find(students, *it)];
         scores.push_back(stu.score()[Find(stu.score(), course_id_)]);
