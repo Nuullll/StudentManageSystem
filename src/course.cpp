@@ -75,11 +75,12 @@ void Course::update_score()
         std::cout << stu.name() << ' ';
         std::cout << "³É¼¨: ";
         int num = 0;
-        if (!(std::cin >> num) || num < 0 || num >= 100)
+        if (!(std::cin >> num) || num < 0 || num > 100)
         {
 			std::cin.clear();
 			std::cin.sync();
             HighlightPrint("ÊäÈë´íÎó!\n");
+			MyGetCh();
             return;
         }
         std::cin.get();
