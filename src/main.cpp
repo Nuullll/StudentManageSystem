@@ -27,7 +27,7 @@ login:              // 登录标签.
             std::cout << "登录成功!\n";
             std::cout << "欢迎";
             user->print();  // 显示用户基本信息.
-			getch();
+			MyGetCh();
             break;
         }
         else
@@ -35,7 +35,7 @@ login:              // 登录标签.
             ClearScreen();  // 清屏显示错误.
             std::cout << "学号(工号)或密码错误! 重新输入? \n";
             std::cout << "[回车继续, q退出系统] ";
-            if (getch() == 'q')     // 退出系统.
+            if (MyGetCh() == std::make_pair(1,'q'))     // 退出系统.
             {
                 HighlightPrint("\n再见! \n");
                 return 0;
@@ -65,83 +65,72 @@ login:              // 登录标签.
             while (true)
             {
                 now.show(k);    // 展示菜单, 第k项高亮显示
-                int ch = getch();   // 获取键盘输入(非缓冲)
-                if (ch == 13)   // 回车键, 等价与方向键右
-                    goto admin_right;
-                if (ch == 27)   // ESC键, 等价于方向键左
-                    goto admin_left;
-                while (ch != 224)   // 方向键需getch()两次.
-                    ;
-                switch (getch())
+                Key ch = MyGetCh();   // 获取键盘输入(非缓冲)
+                if (ch == UP)
                 {
-                    case UP:
+                    if (--k < 0)
+                        k = now.options_target.size() - 1; // 选中最后一项.
+                    continue;
+                }
+                if (ch == DOWN)
+                {
+                    if (++k > now.options_target.size() - 1)
+                        k = 0;  // 选中第一项.
+                    continue;
+                }
+                if (ch == LEFT || ch == ESCAPE)
+                {
+                    now = *now.previous;    // 返回上级菜单.
+                    k = 0;
+                    continue;
+                }
+                if (ch == RIGHT || ch == ENTER)
+                {
+                    if (now.options_target[k] == NULL)
                     {
-                        if (--k < 0)
-                            k = now.options_target.size() - 1; // 选中最后一项.
-                        break;
-                    }
-                    case DOWN:
-                    {
-                        if (++k > now.options_target.size() - 1)
-                            k = 0;  // 选中第一项.
-                        break;
-                    }
-                    case LEFT:
-                    {
-admin_left:
-                        now = *now.previous;    // 返回上级菜单.
-                        k = 0;
-                        break;
-                    }
-                    case RIGHT:
-                    {
-admin_right:
-                        if (now.options_target[k] == NULL)
+                        std::map<std::string, int> mp;
+                        mp["退出系统"] = 0;
+                        mp["新用户注册"] = 1;
+                        mp["删除用户"] = 2;
+                        mp["修改密码"] = 3;
+                        mp["退出登录"] = 4;
+                        switch (mp[now.options_text[k]])
                         {
-							std::map<std::string, int> mp;
-							mp["退出系统"] = 0;
-							mp["新用户注册"] = 1;
-							mp["删除用户"] = 2;
-                            mp["修改密码"] = 3;
-                            mp["退出登录"] = 4;
-                            switch (mp[now.options_text[k]])
+                            case 0:
                             {
-                                case 0:
-                                {
-                                    Exit();
-                                    break;
-                                }
-                                case 1:
-                                {
-                                    admin.add_user();
-                                    break;
-                                }
-                                case 2:
-                                {
-                                    admin.del_user();
-                                    break;
-                                }
-                                case 3:
-                                {
-                                    admin.set_password();
-                                    break;
-                                }
-                                case 4:
-                                    goto login;
+                                Exit();
+                                break;
                             }
-                            k = 0;
-                            break;
+                            case 1:
+                            {
+                                admin.add_user();
+                                break;
+                            }
+                            case 2:
+                            {
+                                admin.del_user();
+                                break;
+                            }
+                            case 3:
+                            {
+                                admin.set_password();
+                                break;
+                            }
+                            case 4:
+                                goto login;
                         }
-                        else
-                        {
-                            now = *now.options_target[k];
-                            k = 0;
-                            break;
-                        }
+                        k = 0;
+                        continue;
+                    }
+                    else
+                    {
+                        now = *now.options_target[k];
+                        k = 0;
+                        continue;
                     }
                 }
-            }
-        }
+			}
+		}
         // 教师菜单.
         case TEACHER:
         {
@@ -163,99 +152,88 @@ admin_right:
             int k = 0;
             while (true)
             {
-                now.show(k);
-                int ch = getch();
-                if (ch == 13)
-                    goto teacher_right;
-                if (ch == 27)
-                    goto teacher_left;
-                while (ch != 224)
-                    ;
-                switch (getch())
+                now.show(k);    // 展示菜单, 第k项高亮显示
+                Key ch = MyGetCh();   // 获取键盘输入(非缓冲)
+                if (ch == UP)
                 {
-                    case UP:
+                    if (--k < 0)
+                        k = now.options_target.size() - 1; // 选中最后一项.
+                    continue;
+                }
+                if (ch == DOWN)
+                {
+                    if (++k > now.options_target.size() - 1)
+                        k = 0;  // 选中第一项.
+                    continue;
+                }
+                if (ch == LEFT || ch == ESCAPE)
+                {
+                    now = *now.previous;    // 返回上级菜单.
+                    k = 0;
+                    continue;
+                }
+                if (ch == RIGHT || ch == ENTER)
+                {
+                    if (now.options_target[k] == NULL)
                     {
-                        if (--k < 0)
-                            k = now.options_target.size() - 1;
-                        break;
-                    }
-                    case DOWN:
-                    {
-                        if (++k > now.options_target.size() - 1)
-                            k = 0;
-                        break;
-                    }
-                    case LEFT:
-                    {
-teacher_left:
-                        now = *now.previous;
-                        k = 0;
-                        break;
-                    }
-                    case RIGHT:
-                    {
-teacher_right:
-                        if (now.options_target[k] == NULL)
+                        std::map<std::string, int> mp;
+                        mp["退出系统"] = 0;
+                        mp["查看班级"] = 1;
+                        mp["增开课程"] = 2;
+                        mp["修改密码"] = 3;
+                        mp["退出登录"] = 4;
+						for (int i = 0; i < teacher.course_id().size(); i++)
+							mp[courses[Find(courses, teacher.course_id()[i])].name()] = 5;
+                        switch (mp[now.options_text[k]])
                         {
-                            std::map<std::string, int> mp;
-                            mp["退出系统"] = 0;
-                            mp["查看班级"] = 1;
-                            mp["增开课程"] = 2;
-                            mp["修改密码"] = 3;
-                            mp["退出登录"] = 4;
-							for (int i = 0; i < teacher.course_id().size(); i++)
-								mp[courses[Find(courses, teacher.course_id()[i])].name()] = 5;
-                            switch (mp[now.options_text[k]])
+                            case 0:
                             {
-                                case 0:
-                                {
-                                    Exit();
-                                    break;
-                                }
-                                case 1:
-                                {
-                                    teacher.display_class();
-                                    break;
-                                }
-                                case 2:
-                                {
-                                    teacher.add_course();
-                                    break;
-                                }
-                                case 3:
-                                {
-                                    teacher.set_password();
-                                    break;
-                                }
-                                case 4:
-                                    goto login;
-                                case 5:
-                                {
-                                    Course course = courses[Find(courses, now.options_text[k])];
-                                    if (course.is_scoring())
-                                    {
-										ClearScreen();
-                                        std::cout << "现在录入成绩? [y/n]";
-                                        ch = getch();
-                                        if (ch == 'y' || ch == 'Y')
-                                        {
-                                            course.update_score();
-                                            break;
-                                        }
-                                    }
-                                    course.display();
-                                    break;
-                                }
+                                Exit();
+                                break;
                             }
-                            k = 0;
-                            break;
+                            case 1:
+                            {
+                                teacher.display_class();
+                                break;
+                            }
+                            case 2:
+                            {
+                                teacher.add_course();
+                                break;
+                            }
+                            case 3:
+                            {
+                                teacher.set_password();
+                                break;
+                            }
+                            case 4:
+                                goto login;
+                            case 5:
+                            {
+                                Course course = courses[Find(courses, now.options_text[k])];
+                                if (course.is_scoring())
+                                {
+									ClearScreen();
+                                    std::cout << "现在录入成绩? [y/n]";
+                                    ch = MyGetCh();
+                                    if (ch == std::make_pair(1, 'y') || ch == std::make_pair(1, 'Y'))
+                                    {
+                                        course.update_score();
+                                        break;
+                                    }
+                                }
+                                course.display();
+                                break;
+                            }
                         }
-                        else
-                        {
-                            now = *now.options_target[k];
-                            k = 0;
-                            break;
-                        }
+                        k = 0;
+                        continue;
+                    }
+                    else
+                    {
+                        now = *now.options_target[k];
+                        k = 0;
+                        continue;
                     }
                 }
             }
@@ -277,80 +255,69 @@ teacher_right:
             int k = 0;
             while (true)
             {
-                now.show(k);
-                int ch = getch();
-                if (ch == 13)
-                    goto student_right;
-                if (ch == 27)
-                    goto student_left;
-                while (ch != 224)
-                    ;
-                switch (getch())
+                now.show(k);    // 展示菜单, 第k项高亮显示
+                Key ch = MyGetCh();   // 获取键盘输入(非缓冲)
+                if (ch == UP)
                 {
-                    case UP:
+                    if (--k < 0)
+                        k = now.options_target.size() - 1; // 选中最后一项.
+                    continue;
+                }
+                if (ch == DOWN)
+                {
+                    if (++k > now.options_target.size() - 1)
+                        k = 0;  // 选中第一项.
+                    continue;
+                }
+                if (ch == LEFT || ch == ESCAPE)
+                {
+                    now = *now.previous;    // 返回上级菜单.
+                    k = 0;
+                    continue;
+                }
+                if (ch == RIGHT || ch == ENTER)
+                {
+                    if (now.options_target[k] == NULL)
                     {
-                        if (--k < 0)
-                            k = now.options_target.size() - 1;
-                        break;
-                    }
-                    case DOWN:
-                    {
-                        if (++k > now.options_target.size() - 1)
-                            k = 0;
-                        break;
-                    }
-                    case LEFT:
-                    {
-student_left:
-                        now = *now.previous;
-                        k = 0;
-                        break;
-                    }
-                    case RIGHT:
-                    {
-                        student_right:
-                        if (now.options_target[k] == NULL)
+                        std::map<std::string, int> mp;
+                        mp["所有课程"] = 0;
+                        mp["增加课程"] = 1;
+                        mp["退出系统"] = 2;
+                        mp["修改密码"] = 3;
+                        mp["退出登录"] = 4;
+                        switch (mp[now.options_text[k]])
                         {
-                            std::map<std::string, int> mp;
-                            mp["所有课程"] = 0;
-                            mp["增加课程"] = 1;
-                            mp["退出系统"] = 2;
-                            mp["修改密码"] = 3;
-                            mp["退出登录"] = 4;
-                            switch (mp[now.options_text[k]])
+                            case 0:
                             {
-                                case 0:
-                                {
-                                    student.course_info();
-                                    break;
-                                }
-                                case 1:
-                                {
-                                    student.add_course();
-                                    break;
-                                }
-                                case 2:
-                                {
-                                    Exit();
-                                    break;
-                                }
-                                case 3:
-                                {
-                                    student.set_password();
-                                    break;
-                                }
-                                case 4:
-                                    goto login;
+                                student.course_info();
+                                break;
                             }
-                            k = 0;
-                            break;
+                            case 1:
+                            {
+                                student.add_course();
+                                break;
+                            }
+                            case 2:
+                            {
+                                Exit();
+                                break;
+                            }
+                            case 3:
+                            {
+                                student.set_password();
+                                break;
+                            }
+                            case 4:
+                                goto login;
                         }
-                        else
-                        {
-                            now = *now.options_target[k];
-                            k = 0;
-                            break;
-                        }
+                        k = 0;
+                        continue;
+                    }
+                    else
+                    {
+                        now = *now.options_target[k];
+                        k = 0;
+                        continue;
                     }
                 }
             }
@@ -377,105 +344,95 @@ student_left:
             int k = 0;
             while (true)
             {
-                now.show(k);
-                int ch = getch();
-                if (ch == 13)
-                    goto ta_right;
-                if (ch == 27)
-                    goto ta_left;
-                while (ch != 224)
-                    ;
-                switch (getch())
+                now.show(k);    // 展示菜单, 第k项高亮显示
+                Key ch = MyGetCh();   // 获取键盘输入(非缓冲)
+                if (ch == UP)
                 {
-                    case UP:
+                    if (--k < 0)
+                        k = now.options_target.size() - 1; // 选中最后一项.
+                    continue;
+                }
+                if (ch == DOWN)
+                {
+                    if (++k > now.options_target.size() - 1)
+                        k = 0;  // 选中第一项.
+                    continue;
+                }
+                if (ch == LEFT || ch == ESCAPE)
+                {
+                    now = *now.previous;    // 返回上级菜单.
+                    k = 0;
+                    continue;
+                }
+                if (ch == RIGHT || ch == ENTER)
+                {
+                    if (now.options_target[k] == NULL)
                     {
-                        if (--k < 0)
-                            k = now.options_target.size() - 1;
-                        break;
-                    }
-                    case DOWN:
-                    {
-                        if (++k > now.options_target.size() + 1)
-                            k = 0;
-                        break;
-                    }
-                    case LEFT:
-                    {
-ta_left:
-                        now = *now.previous;
-                        k = 0;
-                        break;
-                    }
-                    case RIGHT:
-                    {
-ta_right:
-                        if (now.options_target[k] == NULL)
+                        std::map<std::string, int> mp;
+                        mp["退出系统"] = 0;
+                        mp["增开课程"] = 1;
+                        mp["所有课程"] = 2;
+                        mp["增加课程"] = 3;
+                        mp["修改密码"] = 4;
+                        mp["退出登录"] = 5;
+						for (int i = 0; i < ta.Teacher::course_id().size(); i++)
+							mp[courses[Find(courses, ta.Teacher::course_id()[i])].name()] = 6;
+                        switch (mp[now.options_text[k]])
                         {
-                            std::map<std::string, int> mp;
-                            mp["退出系统"] = 0;
-                            mp["增开课程"] = 1;
-                            mp["所有课程"] = 2;
-                            mp["增加课程"] = 3;
-                            mp["修改密码"] = 4;
-                            mp["退出登录"] = 5;
-							for (int i = 0; i < ta.Teacher::course_id().size(); i++)
-								mp[courses[Find(courses, ta.Teacher::course_id()[i])].name()] = 6;
-                            switch (mp[now.options_text[k]])
+                            case 0:
                             {
-                                case 0:
-                                {
-                                    Exit();
-                                    break;
-                                }
-                                case 1:
-                                {
-                                    ta.Teacher::add_course();
-                                    break;
-                                }
-                                case 2:
-                                {
-                                    ta.Student::course_info();
-                                    break;
-                                }
-                                case 3:
-                                {
-                                    ta.Student::add_course();
-                                    break;
-                                }
-                                case 4:
-                                {
-                                    ta.set_password();
-                                    break;
-                                }
-                                case 5:
-                                    goto login;
-                                case 6:
-                                {
-                                    Course course = courses[Find(courses, now.options_text[k])];
-                                    if (course.is_scoring())
-                                    {
-										ClearScreen();
-                                        std::cout << "现在录入成绩? [y/n]";
-                                        ch = getch();
-                                        if (ch == 'y' || ch == 'Y')
-                                        {
-                                            course.update_score();
-                                            break;
-                                        }
-                                    }
-                                    course.display();
-                                    break;
-                                }
+                                Exit();
+                                break;
                             }
-							k = 0;
-							break;
+                            case 1:
+                            {
+                                ta.Teacher::add_course();
+                                break;
+                            }
+                            case 2:
+                            {
+                                ta.Student::course_info();
+                                break;
+                            }
+                            case 3:
+                            {
+                                ta.Student::add_course();
+                                break;
+                            }
+                            case 4:
+                            {
+                                ta.set_password();
+                                break;
+                            }
+                            case 5:
+                                goto login;
+                            case 6:
+                            {
+                                Course course = courses[Find(courses, now.options_text[k])];
+                                if (course.is_scoring())
+                                {
+									ClearScreen();
+                                    std::cout << "现在录入成绩? [y/n]";
+                                    ch = MyGetCh();
+                        
+                                    if (ch == std::make_pair(1, 'y') || ch == std::make_pair(1, 'Y'))
+                                    {
+                                        course.update_score();
+                                        break;
+                                    }
+                                }
+                                course.display();
+                                break;
+                            }
                         }
-                        else
-                        {
-                            now = *now.options_target[k];
-                            k = 0;
-                            break;
-                        }
+						k = 0;
+						continue;
+                    }
+                    else
+                    {
+                        now = *now.options_target[k];
+                        k = 0;
+                        continue;
                     }
                 }
             }

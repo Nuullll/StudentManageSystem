@@ -11,6 +11,14 @@ std::vector<Student> students;
 std::vector<TeachingAssistant> tas; // ta: teachingassistant
 std::vector<Course> courses;
 
+Key MyGetCh()
+{
+	int ch = getch();
+	if (kbhit())
+		return std::make_pair(2, getch());
+	return std::make_pair(1, ch);
+}
+
 std::string GetPass()
 {
     int c;
@@ -106,14 +114,21 @@ std::string GetPass()
 
 Token Login()
 {
-    std::cout << "ÇëµÇÂ¼\n";
+	ClearScreen();
+	std::cout << "ÇëµÇÂ¼\n";
 	int id;
-    std::string pwd;
-    std::cout << "ÇëÊäÈëÄúµÄÑ§ºÅ(¹¤ºÅ): ";
-    std::cin >> id;
-    std::cout << "ÇëÊäÈëÄúµÄÃÜÂë: ";
-    pwd = GetPass();
-    return Token(id, pwd);
+	std::string pwd;
+	std::cout << "ÇëÊäÈëÄúµÄÑ§ºÅ(¹¤ºÅ): ";
+	if (!(std::cin >> id))
+	{
+		std::cin.clear();
+		std::cin.sync();
+		return Token(-1, "");
+	}
+	std::cin.get();
+	std::cout << "ÇëÊäÈëÄúµÄÃÜÂë: ";
+	pwd = GetPass();
+	return Token(id, pwd);
 }
 
 void ClearScreen()
@@ -126,8 +141,8 @@ void Exit()
 {
     ClearScreen();  // ÇåÆÁ
     std::cout << "È·ÈÏÍË³ö? [y/n]" << std::endl;
-    char ch = getch();
-    if (ch == 'y' || ch == 'Y')
+    Key ch = MyGetCh();
+    if (ch == std::make_pair(1, 'y') || ch == std::make_pair(1, 'Y'))
     {
         std::cout << "ÔÙ¼û!" << std::endl;
         exit(1);
@@ -159,7 +174,7 @@ void UpdateUsers()
 	ReadUsers();
 	ReadCourses();
 	HighlightPrint("¼ÓÔØÍê±Ï! \n");
-	getch();
+	MyGetCh();
 	return;
 }
 

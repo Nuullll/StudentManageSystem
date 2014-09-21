@@ -5,14 +5,10 @@
 
 #include "user.h"
 #include <string>
+#include <utility>
 #include "course.h"
 #include "token.h"
 #include "menu.h"
-
-#define UP 72
-#define DOWN 80
-#define LEFT 75
-#define RIGHT 77
 
 extern std::vector<User*> users;   // 所有用户基类指针.
 extern std::vector<Administrator> admins;  
@@ -21,6 +17,16 @@ extern std::vector<Student> students;
 extern std::vector<TeachingAssistant> tas; // ta: teachingassistant
 extern std::vector<Course> courses;
 
+typedef std::pair<int, char> Key;	// first = times, second = ch;
+
+const Key ENTER = std::make_pair(1, char(13));
+const Key ESCAPE = std::make_pair(1, char(27));
+const Key UP = std::make_pair(2, char(72));
+const Key DOWN = std::make_pair(2, char(80));
+const Key LEFT = std::make_pair(2, char(75));
+const Key RIGHT = std::make_pair(2, char(77));
+
+Key MyGetCh();
 std::string GetPass();
 Token Login();
 void ClearScreen();

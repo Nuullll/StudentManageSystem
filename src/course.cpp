@@ -60,7 +60,7 @@ void Course::display()
             std::cout << stu.score()[Find(stu.score(), id_)].num() << std::endl;
         }
     }
-	getch();
+	MyGetCh();
     return;
 }
 
@@ -75,16 +75,19 @@ void Course::update_score()
         std::cout << stu.name() << ' ';
         std::cout << "成绩: ";
         int num = 0;
-        if (!(std::cin >> num))
+        if (!(std::cin >> num) || num < 0 || num >= 100)
         {
+			std::cin.clear();
+			std::cin.sync();
             HighlightPrint("输入错误!\n");
             return;
         }
+        std::cin.get();
         stu.add_score(Score(id_, num));
         stu.update();
     }
     HighlightPrint("录入完毕!\n");
-    getch();
+    MyGetCh();
     return;
 }
 

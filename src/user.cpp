@@ -25,7 +25,7 @@ void User::set_password()
     if (origin != password_)
     {
         HighlightPrint("密码错误! \n");
-		getch();
+		MyGetCh();
         return;
     }
     std::cout << "新密码: ";
@@ -33,7 +33,7 @@ void User::set_password()
     if (!ValidPassword(new_pwd))
     {
         HighlightPrint("请设置6~15位数字字母密码!\n");
-		getch();
+		MyGetCh();
         return;
     }
     std::cout << "重复新密码: ";
@@ -41,13 +41,13 @@ void User::set_password()
     if (new_pwd != confirm)
     {
         HighlightPrint("两次密码不一致!\n");
-		getch();
+		MyGetCh();
         return;
     }
     password_ = new_pwd;
     update();
     HighlightPrint("设置成功!\n");
-	getch();
+	MyGetCh();
     return;
 }
 
@@ -71,31 +71,26 @@ void Administrator::add_user()
             }
             std::cout << identities[i] + '\n';
         }
-        int ch = getch();
-        if (ch == 13)   // 回车选定.
+        Key ch = MyGetCh();
+        if (ch == UP)
+        {
+            if (--k < 1)
+                k = 3;
+            continue;
+        }
+        if (ch == DOWN)
+        {
+            if (++k > 3)
+                k = 1;
+            continue;
+        }
+        if (ch == LEFT || ch == ESCAPE)
+            return;
+        if (ch == RIGHT || ch == ENTER)
         {
             ClearScreen();
             HighlightPrint(identities[k - 1] + '\n');
-            break;
-        }
-        while (ch != 224)
-            ;
-        switch (getch())
-        {
-            case UP:
-            {
-                if (--k < 1)
-                    k = 3;
-                break;
-            }
-            case DOWN:
-            {
-                if (++k > 3)
-                    k = 1;
-                break;
-            }
-            default:
-                break;
+            continue;
         }
     }
     int new_id = 0;
@@ -108,6 +103,7 @@ void Administrator::add_user()
     std::cout << "请输入姓名: ";
     std::string new_name;
     std::cin >> new_name;
+    std::cin.get();
     std::cout << "密码单打印完毕!\n";      // 默认密码与学号(工号)相同
     HighlightPrint("请尽快修改密码!\n");
     switch (k)
@@ -122,11 +118,12 @@ void Administrator::add_user()
 			fp << "*\n";
 			fp << "#\n";
             std::cout << "若新用户为班主任, 请输入班号: [否则请直接回车] ";
-            if (getch() != 13)      // 班主任
+            if (MyGetCh() != ENTER)      // 班主任
             {
                 fp << 1 << '\n';
                 std::string class_id;
                 std::cin >> class_id;
+                std::cin.get();
                 fp << class_id << "\n\n";
 				fp.close();
                 break;
@@ -149,6 +146,7 @@ void Administrator::add_user()
             std::cout << "班号: ";
             std::string class_id;
             std::cin >> class_id;
+            std::cin.get();
             fp << class_id << '\n';
 			fp << "*\n";
 			fp << "#\n";
@@ -167,6 +165,7 @@ void Administrator::add_user()
             std::cout << "班号: ";
             std::string class_id;
             std::cin >> class_id;
+            std::cin.get();
             fp << class_id << '\n';
 			fp << "*\n";
 			fp << "#\n";
@@ -188,10 +187,11 @@ void Administrator::del_user()
     std::cout << "学号(工号): ";
     int del_id;
     std::cin >> del_id;
+    std::cin.get();
     if (Find(users, del_id) < 0)  // 用户不存在
     {
         std::cout << "用户不存在!\n";
-        getch();
+        MyGetCh();
         ClearScreen();
         return;
     }
@@ -261,6 +261,7 @@ void Teacher::add_course()
     int credit;
     bool is_optional, is_scoring;
     std::cin >> new_id;
+    std::cin.get();
 	int index = Find(courses, new_id);
     if (index >= 0)     // id符合
     {
@@ -270,7 +271,7 @@ void Teacher::add_course()
 		tmp.update();
         update();
 		HighlightPrint("添加成功!\n");
-		getch();
+		MyGetCh();
         return;
     }
     else
@@ -280,36 +281,40 @@ void Teacher::add_course()
         if (!(std::cin >> new_name))
 		{
             HighlightPrint("输入错误! \n");
-			getch();
-			return;
-		}
+            MyGetCh();
+            return;
+        }
+        std::cin.get();
         std::cout << "学分: ";
         if (!(std::cin >> credit))
 		{
-			HighlightPrint("输入错误! \n");
-			getch();
-			return;
-		}
+            HighlightPrint("输入错误! \n");
+            MyGetCh();
+            return;
+        }
+        std::cin.get();
         std::cout << "选修课? [0/1] ";
         if (!(std::cin >> is_optional))
 		{
-			HighlightPrint("输入错误! \n");
-			getch();
-			return;
-		}
+            HighlightPrint("输入错误! \n");
+            MyGetCh();
+            return;
+        }
+        std::cin.get();
         std::cout << "是否记分? [0/1] ";
         if (!(std::cin >> is_scoring))
 		{
-			HighlightPrint("输入错误! \n");
-			getch();
-			return;
-		}
+            HighlightPrint("输入错误! \n");
+            MyGetCh();
+            return;
+        }
+        std::cin.get();
         Course new_course(new_id, new_name, credit, is_optional, is_scoring);
         new_course.add_teacher(id_);
         course_id_.push_back(new_id);
         update();
 		HighlightPrint("添加成功!\n");
-		getch();
+		MyGetCh();
         return;
     }
 }
@@ -333,7 +338,7 @@ void Teacher::display_class()
     std::cout << "[按GPA排序]\n";
     for (std::vector<Student>::iterator it = my_class.begin(); it != my_class.end(); it++)
         it->display_gpa_info();
-    getch();
+    MyGetCh();
     return;
 }
 
@@ -418,16 +423,17 @@ void Student::add_course()
     HighlightPrint("课程ID: ");
     std::string add_id;
     std::cin >> add_id;
+    std::cin.get();
     if (Find(courses, add_id) < 0)
     {
         HighlightPrint("没有该课程! 请核对课程ID.\n");
-        getch();
+        MyGetCh();
         return;
     }
 	if (Find(course_id_, add_id) >= 0)
 	{
 		HighlightPrint("已经添加过该课程!\n");
-		getch();
+		MyGetCh();
 		return;
 	}
     course_id_.push_back(add_id);
@@ -436,7 +442,7 @@ void Student::add_course()
 	tmp.add_student(id_);
     WriteCourses();
     HighlightPrint("添加成功!\n");
-    getch();
+    MyGetCh();
     return;
 }
 
@@ -474,7 +480,7 @@ void Student::course_info()
             printf("%12s\n","不记分");
     }
     std::cout << "总GPA: " << gpa() << std::endl;
-	getch();
+	MyGetCh();
     return;
 }
 
