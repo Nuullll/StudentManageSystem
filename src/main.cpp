@@ -17,7 +17,7 @@ login:              // 登录标签.
 	HighlightPrint("载入数据中...请稍后...\n");
 	UpdateUsers();
     ClearScreen();      // 保留软件标题的清屏函数.
-    Token tmp;      // 获取登录信息的令牌.
+    Token tmp;		// 获取登录信息的令牌.
     User* user;     // 当前登录的用户.
     while (true)
     {

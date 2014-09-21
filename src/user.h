@@ -25,7 +25,6 @@ public:
 
     virtual void print() = 0;
     virtual void update() = 0;  // 更新全局vector
-    friend std::ofstream &operator <<(std::ofstream &of, const User &u);
     bool operator ==(const int id){ return id_ == id; }
     int id() { return id_; }
     int identity() { return identity_; }

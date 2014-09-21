@@ -1,5 +1,8 @@
 // global.h
 
+#ifndef GLOBAL_H
+#define GLOBAL_H
+
 #include "user.h"
 #include <string>
 #include "course.h"
@@ -18,9 +21,6 @@ extern std::vector<Student> students;
 extern std::vector<TeachingAssistant> tas; // ta: teachingassistant
 extern std::vector<Course> courses;
 
-int GetX();		// 获取光标x坐标
-int GetY();		// 获取光标y坐标
-void GotoXY(int x, int y);  // 将光标位置设置为(x,y)
 std::string GetPass();
 Token Login();
 void ClearScreen();
@@ -55,3 +55,5 @@ std::vector<A> Remove(std::vector<A> v, B id)
     }
     return v;
 }
+
+#endif
